@@ -11,7 +11,7 @@ exports.getFairs = async(req , res)=>{
 };
 exports.addFair = async(req, res)=>{
     try{
-        await fairServeice.createNewFair(req.body);
+        await fairService.createNewFair(req.body);
         res.status(201).json({message: 'Fair created successfully'});  
     }catch(error){
         res.status(500).json({status: "fail", message:error.message});
