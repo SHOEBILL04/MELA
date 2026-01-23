@@ -24,6 +24,24 @@ class StallRepository {
             .query('SELECT * FROM stall WHERE fair_id = @fair_id');
         return result.recordset;
     }
+
+async getAllWithFairDetails() {
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .query(`
+            SELECT 
+                s.stall_id, 
+                s.stall_name, 
+                s.stall_type, 
+                s.location, 
+                s.stall_number,
+                f.Fair_Name, 
+                f.Location as Fair_Location
+            FROM stall s
+            INNER JOIN fair f ON s.fair_id = f.fair_id
+        `);
+    return result.recordset;
+}
 }
 
 module.exports = new StallRepository();
