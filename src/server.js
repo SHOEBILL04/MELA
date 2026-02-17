@@ -3,6 +3,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const fairRoutes = require('./routes/fairRoutes');
 const stallRoutes = require('./routes/stallRoutes');
+const visitorRoutes = require('./routes/visitorRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -13,9 +15,11 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use('/api', fairRoutes);
 app.use('/api/stalls', stallRoutes);
+app.use('/api/visitors', visitorRoutes);
+app.use('/api/reports', reportRoutes);
 
-app.get('/', (req, res) =>{
-    res.send('API is running...');  
+app.get('/', (req, res) => {
+    res.send('API is running...');
 });
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
