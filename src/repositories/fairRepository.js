@@ -14,11 +14,11 @@ class FairRepository {
             .input('Location', sql.NVarChar, data.Location)
             .input('Start_Date', sql.Date, data.Start_Date)
             .input('End_Date', sql.Date, data.End_Date)
-            .input('Organizer_Name', sql.NVarChar, data.Organizer_Name) 
-            .query(`INSERT INTO Fair (Fair_Name, Location, Start_Date, End_Date, Organizer_Name) 
+            .input('Organizer_Name', sql.NVarChar, data.Organizer_Name)
+            .query(`INSERT INTO Fairs (Fair_Name, Location, Start_Date, End_Date, Organizer_Name) 
                     OUTPUT inserted.Fair_ID
                     VALUES (@Fair_Name, @Location, @Start_Date, @End_Date, @Organizer_Name)`);
-        
+
         return result.recordset[0];
     }
 }
