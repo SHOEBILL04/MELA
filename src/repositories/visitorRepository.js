@@ -1,42 +1,30 @@
-const { sql, poolPromise } = require('../config/db');
+const { Visitor, Ticket } = require('../models');
 
 class VisitorRepository {
     async createVisitor(data) {
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input('Name', sql.NVarChar, data.Visitor_Name)
-            .input('Age', sql.Int, data.Age)
-            .input('Gender', sql.NVarChar, data.Gender)
-            .input('Contact', sql.NVarChar, data.Contact_Number)
-            .execute('sp_AddVisitor');
-
-        return result.recordset[0];
+        return await Visitor.create({
+            Visitor_Name: data.Visitor_Name,
+            Age: data.Age,
+            Gender: data.Gender,
+            Contact_Number: data.Contact_Number
+        });
     }
 
     async buyTicket(data) {
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input('Visitor_ID', sql.Int, data.Visitor_ID)
-            .input('Ticket_Type', sql.NVarChar, data.Ticket_Type)
-            .input('Price', sql.Decimal(10, 2), data.Price)
-            .input('Visit_Date', sql.Date, data.Visit_Date)
-            .execute('sp_BuyTicket');
-
-        return result.recordset[0];
+        return await Ticket.create({
+            Ticket_Type: data.Ticket_Type,
+            Price: data.Price,
+            Visit_Date: data.Visit_Date,
+            Visitor_ID: data.Visitor_ID
+        });
     }
 
     async getAllVisitors() {
-        const pool = await poolPromise;
-        const result = await pool.request().query('SELECT * FROM Visitors');
-        return result.recordset;
+        return await Visitor.findAll();
     }
 
     async getTicketsByVisitor(visitor_id) {
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input('Visitor_ID', sql.Int, visitor_id)
-            .query('SELECT * FROM Tickets WHERE Visitor_ID = @Visitor_ID');
-        return result.recordset;
+        return await Ticket.findAll({ where: { Visitor_ID: visitor_id } });
     }
 }
 

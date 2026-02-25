@@ -1,31 +1,36 @@
-const sql = require('mssql');
+const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-const dbConfig = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME, 
-    server: process.env.DB_SERVER,
-    pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 30000
-    },
-    options: {
-        encrypt: true, 
-        trustServerCertificate: true
+const sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    {
+        host: process.env.DB_SERVER,
+        dialect: 'mssql',
+        dialectOptions: {
+            options: {
+                encrypt: true,
+                trustServerCertificate: true
+            }
+        },
+        pool: {
+            max: 10,
+            min: 0,
+            idle: 30000
+        },
+        logging: false // Set to true to see SQL queries in console
+    }
+);
+
+const connectDB = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Successfully Connected to MSSQL Database using Sequelize:', process.env.DB_NAME);
+    } catch (error) {
+        console.error('Database Connection Failed! Check your .env values.');
+        console.error('Error Details:', error.message);
     }
 };
 
-const poolPromise = new sql.ConnectionPool(dbConfig)
-    .connect()
-    .then(pool => {
-        console.log('Successfully Connected to MSSQL Database:', process.env.DB_NAME);
-        return pool;
-    })
-    .catch(err => {
-        console.error('Database Connection Failed! Check your .env values.');
-        console.error('Error Details:', err.message);
-    });
-
-module.exports = { sql, poolPromise };
+module.exports = { sequelize, connectDB };
