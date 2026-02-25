@@ -7,6 +7,9 @@ const visitorRoutes = require('./routes/visitorRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 require('dotenv').config();
 
+const { connectDB } = require('./config/db');
+const db = require('./models');
+
 const app = express();
 
 //Middleware
@@ -22,6 +25,17 @@ app.get('/', (req, res) => {
     res.send('API is running...');
 });
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+
+// Connect and Sync Code-First DB then start server
+connectDB().then(async () => {
+    try {
+        await db.sequelize.sync({ alter: true }); // Sync models to DB (alter true to auto-create missing tables/columns)
+        console.log('Database synchronized based on Code-First models.');
+
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    } catch (err) {
+        console.error('Failed to sync database:', err);
+    }
 });
