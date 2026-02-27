@@ -9,7 +9,7 @@ exports.addStall = async(req, res)=>{
 };
 exports.getStalls = async(req, res)=>{
     try{
-        const stalls = await stallService.getStallsForFair(req.params.fair.id);
+        const stalls = await stallService.getStallsForFair(req.params.fair_id);
         res.status(200).json(stalls);
     }catch(error){
         res.status(500).json({message: error.message});
