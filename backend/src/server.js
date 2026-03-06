@@ -1,35 +1,15 @@
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-const fairRoutes = require('./routes/fairRoutes');
-const stallRoutes = require('./routes/stallRoutes');
-const visitorRoutes = require('./routes/visitorRoutes');
-const reportRoutes = require('./routes/reportRoutes');
-require('dotenv').config();
-
+const app = require('./app');
 const { connectDB } = require('./config/db');
 const db = require('./models');
+require('dotenv').config();
 
-const app = express();
-
-//Middleware
-app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json());
-app.use('/api', fairRoutes);
-app.use('/api/stalls', stallRoutes);
-app.use('/api/visitors', visitorRoutes);
-app.use('/api/reports', reportRoutes);
-
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
 const PORT = process.env.PORT || 5000;
 
-// Connect and Sync Code-First DB then start server
+// Connect and Sync Database then start server
 connectDB().then(async () => {
     try {
-        await db.sequelize.sync({ alter: true }); // Sync models to DB (alter true to auto-create missing tables/columns)
+        // Use { alter: true } only in development. In production, use migrations.
+        await db.sequelize.sync({ alter: true });
         console.log('Database synchronized based on Code-First models.');
 
         app.listen(PORT, () => {
@@ -37,5 +17,9 @@ connectDB().then(async () => {
         });
     } catch (err) {
         console.error('Failed to sync database:', err);
+        process.exit(1);
     }
+}).catch(err => {
+    console.error('Failed to connect to database:', err);
+    process.exit(1);
 });

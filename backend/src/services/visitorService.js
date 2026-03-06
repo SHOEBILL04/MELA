@@ -9,6 +9,10 @@ class VisitorService {
         return await visitorRepository.buyTicket(data);
     }
 
+    async cancelTicket(ticket_id) {
+        return await visitorRepository.cancelTicket(ticket_id);
+    }
+
     async getAllVisitors() {
         return await visitorRepository.getAllVisitors();
     }

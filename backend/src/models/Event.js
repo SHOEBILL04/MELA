@@ -35,6 +35,10 @@ const Event = sequelize.define('Event', {
             model: Fair,
             key: 'Fair_ID'
         }
+    },
+    Organizer_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
     tableName: 'Events',
