@@ -27,6 +27,10 @@ const Stall = sequelize.define('Stall', {
             model: Fair,
             key: 'Fair_ID'
         }
+    },
+    Vendor_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: true
     }
 }, {
     tableName: 'Stalls',

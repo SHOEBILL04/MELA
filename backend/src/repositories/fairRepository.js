@@ -12,11 +12,12 @@ const fairRepository = {
     createFair: async (fairData) => {
         console.log('Inserting fairData:', fairData);
         return await Fair.create({
-            Fair_Name: fairData.fair_name,
-            Location: fairData.location,
-            Start_Date: fairData.start_date,
-            End_Date: fairData.end_date,
-            Organizer_Name: fairData.organizer_name
+            Fair_Name: fairData.Fair_Name,
+            Location: fairData.Location,
+            Start_Date: fairData.Start_Date,
+            End_Date: fairData.End_Date,
+            Organizer_ID: fairData.Organizer_ID,
+            Daily_Ticket_Limit: fairData.Daily_Ticket_Limit || 1000
         });
     },
 

@@ -30,13 +30,24 @@ const Fair = sequelize.define('Fair', {
             }
         }
     },
-    Organizer_Name: {
-        type: DataTypes.STRING(100),
-        allowNull: true
+    Organizer_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    Daily_Ticket_Limit: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
     tableName: 'Fairs',
-    timestamps: false
+    timestamps: false,
+    hooks: {
+        beforeValidate: (fair, options) => {
+            if (fair.Daily_Ticket_Limit === undefined || fair.Daily_Ticket_Limit === null) {
+                fair.Daily_Ticket_Limit = 1000;
+            }
+        }
+    }
 });
 
 module.exports = Fair;

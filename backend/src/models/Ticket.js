@@ -27,10 +27,25 @@ const Ticket = sequelize.define('Ticket', {
             model: Visitor,
             key: 'Visitor_ID'
         }
+    },
+    Fair_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    Status: {
+        type: DataTypes.STRING(20),
+        allowNull: false
     }
 }, {
     tableName: 'Tickets',
-    timestamps: false
+    timestamps: false,
+    hooks: {
+        beforeValidate: (ticket, options) => {
+            if (ticket.Status === undefined || ticket.Status === null) {
+                ticket.Status = 'Booked';
+            }
+        }
+    }
 });
 
 module.exports = Ticket;

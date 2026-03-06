@@ -1,9 +1,30 @@
 -- 03_seed.sql
 -- Sample data for Fair Management System
 
+-- 0. Insert Users
+INSERT INTO dbo.Users (Email, Password, Role)
+VALUES 
+('admin@mela.com', 'admin123', 'Admin'),
+('owner@mela.com', 'owner123', 'FairOwner'),
+('vendor1@mela.com', 'vendor123', 'Vendor'),
+('vendor2@mela.com', 'vendor123', 'Vendor'),
+('visitor@mela.com', 'visitor123', 'Visitor'),
+('emp1@mela.com', 'emp123', 'Employee'),
+('emp2@mela.com', 'emp123', 'Employee'),
+('emp3@mela.com', 'emp123', 'Employee');
+
+-- Store IDs (Assume they get IDs 1 to 8 sequentially)
+DECLARE @OwnerUserID INT = 2;
+DECLARE @Vendor1UserID INT = 3;
+DECLARE @Vendor2UserID INT = 4;
+DECLARE @VisitorUserID INT = 5;
+DECLARE @Emp1UserID INT = 6;
+DECLARE @Emp2UserID INT = 7;
+DECLARE @Emp3UserID INT = 8;
+
 -- 1. Insert Fair
-INSERT INTO dbo.Fairs (Fair_Name, Location, Start_Date, End_Date, Organizer_Name)
-VALUES ('Dhaka International Trade Fair 2026', 'Purbachal, Dhaka', '2026-01-01', '2026-01-31', 'Export Promotion Bureau');
+INSERT INTO dbo.Fairs (Fair_Name, Location, Start_Date, End_Date, Organizer_ID)
+VALUES ('Dhaka International Trade Fair 2026', 'Purbachal, Dhaka', '2026-01-01', '2026-01-31', @OwnerUserID);
 
 DECLARE @FairID INT = SCOPE_IDENTITY();
 
@@ -19,17 +40,17 @@ DECLARE @Stall1 INT = (SELECT TOP 1 Stall_ID FROM dbo.Stalls WHERE Stall_Name = 
 DECLARE @Stall2 INT = (SELECT TOP 1 Stall_ID FROM dbo.Stalls WHERE Stall_Name = 'Fashion World');
 
 -- 3. Insert Vendors
-INSERT INTO dbo.Vendors (Vendor_Name, Phone_Number, Address, Stall_ID)
+INSERT INTO dbo.Vendors (Vendor_Name, Phone_Number, Address, Stall_ID, User_ID)
 VALUES 
-('Rahim Foods', '01711123456', 'Dhaka, Bangladesh', @Stall1),
-('Sultana Fashion', '01811223344', 'Chittagong, Bangladesh', @Stall2);
+('Rahim Foods', '01711123456', 'Dhaka, Bangladesh', @Stall1, @Vendor1UserID),
+('Sultana Fashion', '01811223344', 'Chittagong, Bangladesh', @Stall2, @Vendor2UserID);
 
 -- 4. Insert Employees
-INSERT INTO dbo.Employees (Employee_Name, Role, Phone_Number, Salary, Fair_ID)
+INSERT INTO dbo.Employees (Employee_Name, Role, Phone_Number, Salary, Fair_ID, User_ID)
 VALUES 
-('Abdul Kuddus', 'Security', '01999887766', 15000.00, @FairID),
-('Jorina Begum', 'Cleaner', '01666554433', 10000.00, @FairID),
-('Kamal Hossain', 'Manager', '01555443322', 40000.00, @FairID);
+('Abdul Kuddus', 'Security', '01999887766', 15000.00, @FairID, @Emp1UserID),
+('Jorina Begum', 'Cleaner', '01666554433', 10000.00, @FairID, @Emp2UserID),
+('Kamal Hossain', 'Manager', '01555443322', 40000.00, @FairID, @Emp3UserID);
 
 -- 5. Insert Events
 INSERT INTO dbo.Events (Event_Name, Event_Type, Event_Date, Start_Time, End_Time, Fair_ID)
@@ -38,8 +59,8 @@ VALUES
 ('Folk Music Concert', 'Concert', '2026-01-10', '18:00', '22:00', @FairID);
 
 -- 6. Insert Visitor
-INSERT INTO dbo.Visitors (Visitor_Name, Age, Gender, Contact_Number)
-VALUES ('Karim Uddin', 30, 'Male', '01333221100');
+INSERT INTO dbo.Visitors (Visitor_Name, Age, Gender, Contact_Number, User_ID)
+VALUES ('Karim Uddin', 30, 'Male', '01333221100', @VisitorUserID);
 
 DECLARE @VisitorID INT = SCOPE_IDENTITY();
 

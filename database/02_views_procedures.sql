@@ -57,6 +57,7 @@ BEGIN
         RETURN;
     END
 
+
     INSERT INTO dbo.Tickets (Visitor_ID, Ticket_Type, Price, Visit_Date)
     VALUES (@Visitor_ID, @Ticket_Type, @Price, @Visit_Date);
 

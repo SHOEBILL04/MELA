@@ -22,6 +22,10 @@ const Visitor = sequelize.define('Visitor', {
     Contact_Number: {
         type: DataTypes.STRING(20),
         allowNull: true
+    },
+    User_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
     tableName: 'Visitors',

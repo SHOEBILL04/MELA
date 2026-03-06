@@ -31,6 +31,10 @@ const Employee = sequelize.define('Employee', {
             model: Fair,
             key: 'Fair_ID'
         }
+    },
+    User_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
     tableName: 'Employees',

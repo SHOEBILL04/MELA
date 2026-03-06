@@ -20,14 +20,9 @@ const Vendor = sequelize.define('Vendor', {
         type: DataTypes.STRING(255),
         allowNull: true
     },
-    Stall_ID: {
+    User_ID: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: true,
-        references: {
-            model: Stall,
-            key: 'Stall_ID'
-        }
+        allowNull: false
     }
 }, {
     tableName: 'Vendors',
