@@ -25,12 +25,13 @@ CREATE PROCEDURE dbo.sp_AddVisitor
     @Name NVARCHAR(100),
     @Age INT,
     @Gender NVARCHAR(10),
-    @Contact NVARCHAR(20)
+    @Contact NVARCHAR(20),
+    @User_ID INT -- Added User_ID (Required)
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.Visitors (Visitor_Name, Age, Gender, Contact_Number)
-    VALUES (@Name, @Age, @Gender, @Contact);
+    INSERT INTO dbo.Visitors (Visitor_Name, Age, Gender, Contact_Number, User_ID)
+    VALUES (@Name, @Age, @Gender, @Contact, @User_ID);
     
     SELECT SCOPE_IDENTITY() AS Visitor_ID;
 END;
@@ -43,6 +44,7 @@ GO
 
 CREATE PROCEDURE dbo.sp_BuyTicket
     @Visitor_ID INT,
+    @Fair_ID INT, -- Added Fair_ID (Required)
     @Ticket_Type NVARCHAR(50),
     @Price DECIMAL(10, 2),
     @Visit_Date DATE
@@ -57,9 +59,8 @@ BEGIN
         RETURN;
     END
 
-
-    INSERT INTO dbo.Tickets (Visitor_ID, Ticket_Type, Price, Visit_Date)
-    VALUES (@Visitor_ID, @Ticket_Type, @Price, @Visit_Date);
+    INSERT INTO dbo.Tickets (Visitor_ID, Fair_ID, Ticket_Type, Price, Visit_Date)
+    VALUES (@Visitor_ID, @Fair_ID, @Ticket_Type, @Price, @Visit_Date);
 
     SELECT 1 AS Success, SCOPE_IDENTITY() AS Ticket_ID;
 END;

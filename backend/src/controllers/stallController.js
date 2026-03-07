@@ -26,3 +26,23 @@ exports.getAllStalls = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.updateStall = async (req, res) => {
+    try {
+        const updated = await stallService.modifyStall(req.params.id, req.body);
+        if (!updated) return res.status(404).json({ message: 'Stall not found' });
+        res.status(200).json({ message: 'Stall updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.deleteStall = async (req, res) => {
+    try {
+        const deleted = await stallService.removeStall(req.params.id);
+        if (!deleted) return res.status(404).json({ message: 'Stall not found' });
+        res.status(200).json({ message: 'Stall deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

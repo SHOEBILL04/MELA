@@ -11,5 +11,11 @@ class StallService {
     async getAllStalls() {
         return await stallRepository.getAllWithFairDetails();
     }
+    async modifyStall(id, stallData) {
+        return await stallRepository.update(id, stallData);
+    }
+    async removeStall(id) {
+        return await stallRepository.delete(id);
+    }
 }
 module.exports = new StallService();

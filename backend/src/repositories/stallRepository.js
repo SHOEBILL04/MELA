@@ -22,6 +22,19 @@ class StallRepository {
             }]
         });
     }
+
+    async update(id, data) {
+        const stall = await Stall.findByPk(id);
+        if (!stall) return null;
+        return await stall.update(data);
+    }
+
+    async delete(id) {
+        const stall = await Stall.findByPk(id);
+        if (!stall) return null;
+        await stall.destroy();
+        return true;
+    }
 }
 
 module.exports = new StallRepository();

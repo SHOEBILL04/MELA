@@ -20,6 +20,14 @@ class VisitorService {
     async getVisitorTickets(visitor_id) {
         return await visitorRepository.getTicketsByVisitor(visitor_id);
     }
+
+    async removeTicket(ticket_id) {
+        return await visitorRepository.deleteTicket(ticket_id);
+    }
+
+    async fetchAllTickets() {
+        return await visitorRepository.getAllTickets();
+    }
 }
 
 module.exports = new VisitorService();
