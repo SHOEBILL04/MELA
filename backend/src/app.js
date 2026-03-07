@@ -6,6 +6,7 @@ const fairRoutes = require('./routes/fairRoutes');
 const stallRoutes = require('./routes/stallRoutes');
 const visitorRoutes = require('./routes/visitorRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api/fairs', fairRoutes); // Changed from /api to /api/fairs for consis
 app.use('/api/stalls', stallRoutes);
 app.use('/api/visitors', visitorRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/events', eventRoutes);
 
 app.get('/', (req, res) => {
     res.send('MELA API is running...');

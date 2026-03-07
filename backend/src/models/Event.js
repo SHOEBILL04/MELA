@@ -28,21 +28,15 @@ const Event = sequelize.define('Event', {
         type: DataTypes.TIME,
         allowNull: true
     },
-    Fair_ID: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Fair,
-            key: 'Fair_ID'
-        }
-    },
-    Organizer_ID: {
+ Fair_ID: {
         type: DataTypes.INTEGER,
         allowNull: false
     }
 }, {
     tableName: 'Events',
-    timestamps: false
+    timestamps: false,
+    underscored: false,
+    initialAutoIncrement: 1
 });
 
 module.exports = Event;

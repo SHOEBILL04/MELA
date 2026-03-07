@@ -49,8 +49,8 @@ Fair.hasMany(Event, { foreignKey: 'Fair_ID' });
 Event.belongsTo(Fair, { foreignKey: 'Fair_ID' });
 
 // User (Admin/Vendor) and Event (1:N)
-User.hasMany(Event, { foreignKey: 'Organizer_ID' });
-Event.belongsTo(User, { foreignKey: 'Organizer_ID' });
+//User.hasMany(Event, { foreignKey: 'Organizer_ID' });
+//Event.belongsTo(User, { foreignKey: 'Organizer_ID' });
 
 module.exports = {
     sequelize,
