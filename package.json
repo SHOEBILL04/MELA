@@ -1,23 +1,14 @@
 {
-  "name": "mela",
+  "name": "mela-root",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Root package for Mela Fair Management System",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.6",
-    "dotenv": "^17.2.3",
-    "express": "^5.2.1",
-    "morgan": "^1.10.1",
-    "mssql": "^12.2.0"
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "concurrently": "^8.2.2"
   }
 }
