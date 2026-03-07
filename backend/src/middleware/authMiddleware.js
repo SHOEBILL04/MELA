@@ -15,7 +15,7 @@ exports.verifyToken = async (req, res, next) => {
         const decodedString = Buffer.from(token, 'base64').toString('ascii');
         const [userId, role] = decodedString.split(':');
 
-        if (!userId || !role) {
+        if (!userId || isNaN(userId) || !role) {
             return res.status(401).json({ message: 'Token is invalid format' });
         }
 

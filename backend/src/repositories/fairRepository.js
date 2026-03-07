@@ -21,6 +21,19 @@ const fairRepository = {
         });
     },
 
+    updateFair: async (id, fairData) => {
+        const fair = await Fair.findByPk(id);
+        if (!fair) return null;
+        return await fair.update(fairData);
+    },
+
+    deleteFair: async (id) => {
+        const fair = await Fair.findByPk(id);
+        if (!fair) return null;
+        await fair.destroy();
+        return true;
+    },
+
     getFairStalls: async (id) => {
         return await Stall.findAll({ where: { Fair_ID: id } });
     }

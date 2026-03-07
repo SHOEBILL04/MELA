@@ -8,9 +8,10 @@ const PORT = process.env.PORT || 5000;
 // Connect and Sync Database then start server
 connectDB().then(async () => {
     try {
-        // Use { alter: true } only in development. In production, use migrations.
-        await db.sequelize.sync({ alter: true });
-        console.log('Database synchronized based on Code-First models.');
+        // Since we are using manual SQL scripts for schema (01_schema.sql), 
+        // we disable 'alter: true' to avoid conflicts with existing constraints.
+        await db.sequelize.sync({ alter: false });
+        console.log('Database synchronized.');
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);

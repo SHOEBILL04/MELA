@@ -50,3 +50,22 @@ exports.getTickets = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.getAllTickets = async (req, res) => {
+    try {
+        const tickets = await visitorService.fetchAllTickets();
+        res.status(200).json(tickets);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.deleteTicket = async (req, res) => {
+    try {
+        const deleted = await visitorService.removeTicket(req.params.ticket_id);
+        if (!deleted) return res.status(404).json({ message: 'Ticket not found' });
+        res.status(200).json({ message: 'Ticket deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

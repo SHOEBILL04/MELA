@@ -36,7 +36,8 @@ const Fair = sequelize.define('Fair', {
     },
     Daily_Ticket_Limit: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 1000
     }
 }, {
     tableName: 'Fairs',

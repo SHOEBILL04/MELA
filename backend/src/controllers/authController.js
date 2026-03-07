@@ -1,7 +1,7 @@
-const { User, Visitor, Vendor, Fair } = require('../models');
+const { User, Visitor, Vendor, Fair, Employee } = require('../models');
 
 exports.register = async (req, res) => {
-    const { Email, Password, Role, Name, Age, Gender, Contact_Number, Phone_Number, Address, Stall_ID } = req.body;
+    const { Email, Password, Role, Name, Age, Gender, Contact_Number, Phone_Number, Address, Salary, Fair_ID } = req.body;
 
     try {
         const existingUser = await User.findOne({ where: { Email } });
@@ -13,7 +13,8 @@ exports.register = async (req, res) => {
         const newUser = await User.create({
             Email,
             Password: Password,
-            Role
+            Role,
+            Name: Name || 'Anonymous'
         });
 
         // 3. Create associated profile based on role
@@ -32,7 +33,21 @@ exports.register = async (req, res) => {
                 Phone_Number: Phone_Number || null,
                 Address: Address || null
             });
+        } else if (Role === 'Employee') {
+            if (!Fair_ID) {
+                return res.status(400).json({ message: 'Fair_ID is required for Employee registration' });
+            }
+            await Employee.create({
+                User_ID: newUser.User_ID,
+                Employee_Name: Name || 'Anonymous Employee',
+                Role: 'General',
+                Phone_Number: Phone_Number || null,
+                Salary: Salary || 0,
+                Fair_ID: Fair_ID
+            });
         }
+        // Admin and FairOwner roles do not have separate profile tables in the current SQL schema.
+        // They are fully represented by the record in the Users table.
 
         res.status(201).json({ message: 'User registered successfully', userId: newUser.User_ID, role: newUser.Role });
 
@@ -52,8 +67,9 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        // 2. Compare passwords (Plain text comparison)
-        if (user.Password !== Password) {
+        // 2. Compare passwords (Bcrypt comparison)
+        const isMatch = await user.comparePassword(Password);
+        if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 

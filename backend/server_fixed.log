@@ -1,0 +1,240 @@
+
+> mela@1.0.0 dev
+> nodemon src/server.js
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node src/server.js`[39m
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+Successfully Connected to MSSQL Database using Sequelize: MELADB
+Database synchronized.
+Server running on port 5000
+[32m[nodemon] restarting child process[39m
+[32m[nodemon] starting `node src/server.js`[39m
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+Successfully Connected to MSSQL Database using Sequelize: MELADB
+Database synchronized.
+Server running on port 5000
+Error
+    at Query.run (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/dialects/mssql/query.js:107:25)
+    at /home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MSSqlQueryInterface.select (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+    at async User.findAll (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/model.js:1140:21)
+    at async User.findOne (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/model.js:1240:12)
+    at async exports.register (/home/rakibul/Projects/MELA/backend/src/controllers/authController.js:7:30) {
+  name: 'SequelizeDatabaseError',
+  parent: RequestError: Invalid column name 'Name'.
+      at RequestTokenHandler.onErrorMessage (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/handler.js:287:21)
+      at Readable.<anonymous> (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+      at Readable.emit (node:events:518:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EREQUEST',
+    number: 207,
+    state: 1,
+    class: 16,
+    serverName: 'Phoenix',
+    procName: '',
+    lineNumber: 1,
+    sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+    parameters: undefined
+  },
+  original: RequestError: Invalid column name 'Name'.
+      at RequestTokenHandler.onErrorMessage (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/handler.js:287:21)
+      at Readable.<anonymous> (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+      at Readable.emit (node:events:518:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EREQUEST',
+    number: 207,
+    state: 1,
+    class: 16,
+    serverName: 'Phoenix',
+    procName: '',
+    lineNumber: 1,
+    sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+    parameters: undefined
+  },
+  sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+  parameters: {}
+}
+[0mPOST /api/auth/register [31m500[0m 17.068 ms - 84[0m
+Error
+    at Query.run (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/dialects/mssql/query.js:107:25)
+    at /home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MSSqlQueryInterface.select (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+    at async User.findAll (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/model.js:1140:21)
+    at async User.findOne (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/model.js:1240:12)
+    at async exports.register (/home/rakibul/Projects/MELA/backend/src/controllers/authController.js:7:30) {
+  name: 'SequelizeDatabaseError',
+  parent: RequestError: Invalid column name 'Name'.
+      at RequestTokenHandler.onErrorMessage (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/handler.js:287:21)
+      at Readable.<anonymous> (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+      at Readable.emit (node:events:518:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EREQUEST',
+    number: 207,
+    state: 1,
+    class: 16,
+    serverName: 'Phoenix',
+    procName: '',
+    lineNumber: 1,
+    sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+    parameters: undefined
+  },
+  original: RequestError: Invalid column name 'Name'.
+      at RequestTokenHandler.onErrorMessage (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/handler.js:287:21)
+      at Readable.<anonymous> (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+      at Readable.emit (node:events:518:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EREQUEST',
+    number: 207,
+    state: 1,
+    class: 16,
+    serverName: 'Phoenix',
+    procName: '',
+    lineNumber: 1,
+    sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+    parameters: undefined
+  },
+  sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+  parameters: {}
+}
+[0mPOST /api/auth/register [31m500[0m 117.563 ms - 84[0m
+Error
+    at Query.run (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/dialects/mssql/query.js:107:25)
+    at /home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MSSqlQueryInterface.select (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+    at async User.findAll (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/model.js:1140:21)
+    at async User.findOne (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/model.js:1240:12)
+    at async exports.register (/home/rakibul/Projects/MELA/backend/src/controllers/authController.js:7:30) {
+  name: 'SequelizeDatabaseError',
+  parent: RequestError: Invalid column name 'Name'.
+      at RequestTokenHandler.onErrorMessage (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/handler.js:287:21)
+      at Readable.<anonymous> (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+      at Readable.emit (node:events:518:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EREQUEST',
+    number: 207,
+    state: 1,
+    class: 16,
+    serverName: 'Phoenix',
+    procName: '',
+    lineNumber: 1,
+    sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+    parameters: undefined
+  },
+  original: RequestError: Invalid column name 'Name'.
+      at RequestTokenHandler.onErrorMessage (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/handler.js:287:21)
+      at Readable.<anonymous> (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+      at Readable.emit (node:events:518:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EREQUEST',
+    number: 207,
+    state: 1,
+    class: 16,
+    serverName: 'Phoenix',
+    procName: '',
+    lineNumber: 1,
+    sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+    parameters: undefined
+  },
+  sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+  parameters: {}
+}
+[0mPOST /api/auth/register [31m500[0m 4.783 ms - 84[0m
+Error
+    at Query.run (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/dialects/mssql/query.js:107:25)
+    at /home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MSSqlQueryInterface.select (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+    at async User.findAll (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/model.js:1140:21)
+    at async User.findOne (/home/rakibul/Projects/MELA/backend/node_modules/sequelize/lib/model.js:1240:12)
+    at async exports.register (/home/rakibul/Projects/MELA/backend/src/controllers/authController.js:7:30) {
+  name: 'SequelizeDatabaseError',
+  parent: RequestError: Invalid column name 'Name'.
+      at RequestTokenHandler.onErrorMessage (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/handler.js:287:21)
+      at Readable.<anonymous> (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+      at Readable.emit (node:events:518:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EREQUEST',
+    number: 207,
+    state: 1,
+    class: 16,
+    serverName: 'Phoenix',
+    procName: '',
+    lineNumber: 1,
+    sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+    parameters: undefined
+  },
+  original: RequestError: Invalid column name 'Name'.
+      at RequestTokenHandler.onErrorMessage (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/handler.js:287:21)
+      at Readable.<anonymous> (/home/rakibul/Projects/MELA/backend/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+      at Readable.emit (node:events:518:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EREQUEST',
+    number: 207,
+    state: 1,
+    class: 16,
+    serverName: 'Phoenix',
+    procName: '',
+    lineNumber: 1,
+    sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+    parameters: undefined
+  },
+  sql: "SELECT [User_ID], [Email], [Name], [Password], [Role], [Created_At] FROM [Users] AS [User] WHERE [User].[Email] = N'newuser@example.com';",
+  parameters: {}
+}
+[0mPOST /api/auth/register [31m500[0m 3.992 ms - 84[0m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+Successfully Connected to MSSQL Database using Sequelize: MELADB
+Database synchronized.
+Server running on port 5000
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+Successfully Connected to MSSQL Database using Sequelize: MELADB
+Database synchronized.
+Server running on port 5000
+[32m[nodemon] clean exit - waiting for changes before restart[39m

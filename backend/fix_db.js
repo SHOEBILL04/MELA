@@ -4,46 +4,45 @@ const { sequelize } = require('./src/config/db');
 async function fixDb() {
     try {
         await sequelize.authenticate();
-        console.log('Connected.');
+        console.log('Successfully Connected to Database.');
 
-        // Check if column exists
-        const [results] = await sequelize.query(`
-      SELECT COLUMN_NAME, IS_NULLABLE, COLUMN_DEFAULT 
-      FROM INFORMATION_SCHEMA.COLUMNS 
-      WHERE TABLE_NAME = 'Fairs' AND COLUMN_NAME = 'Daily_Ticket_Limit'
-    `);
+        // 1. Add missing Name column to Users table
+        const [userCols] = await sequelize.query(`
+            SELECT COLUMN_NAME 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'Users' AND COLUMN_NAME = 'Name'
+        `);
 
-        if (results.length === 0) {
-            console.log('Column does not exist. Adding it.');
-            await sequelize.query(`ALTER TABLE Fairs ADD Daily_Ticket_Limit INT NOT NULL DEFAULT 1000;`);
-            console.log('Column added.');
+        if (userCols.length === 0) {
+            console.log('Column "Name" does not exist in Users. Adding it.');
+            await sequelize.query(`ALTER TABLE Users ADD Name NVARCHAR(100);`);
+            console.log('Column "Name" added to Users table.');
         } else {
-            console.log('Column exists:', results[0]);
-            // If it exists but is nullable or has no default, we need to fix it.
-            // Easiest is to drop and recreate, but we might have data.
-            // Let's add the default constraint explicitly if missing.
-            await sequelize.query(`
-        IF NOT EXISTS (
-            SELECT * FROM sys.default_constraints 
-            WHERE parent_object_id = OBJECT_ID('Fairs') 
-            AND col_name(parent_object_id, parent_column_id) = 'Daily_Ticket_Limit'
-        )
-        BEGIN
-            ALTER TABLE Fairs ADD CONSTRAINT DF_Fairs_Daily_Ticket_Limit DEFAULT 1000 FOR Daily_Ticket_Limit;
-        END
-      `);
-
-            // And make it NOT NULL
-            if (results[0].IS_NULLABLE === 'YES') {
-                await sequelize.query(`UPDATE Fairs SET Daily_Ticket_Limit = 1000 WHERE Daily_Ticket_Limit IS NULL;`);
-                await sequelize.query(`ALTER TABLE Fairs ALTER COLUMN Daily_Ticket_Limit INT NOT NULL;`);
-            }
-            console.log('Column altered.');
+            console.log('Column "Name" already exists in Users table.');
         }
+
+        // 2. Add missing Daily_Ticket_Limit to Fairs table (if not already there)
+        const [fairCols] = await sequelize.query(`
+            SELECT COLUMN_NAME 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'Fairs' AND COLUMN_NAME = 'Daily_Ticket_Limit'
+        `);
+
+        if (fairCols.length === 0) {
+            console.log('Column "Daily_Ticket_Limit" does not exist in Fairs. Adding it.');
+            await sequelize.query(`ALTER TABLE Fairs ADD Daily_Ticket_Limit INT NOT NULL DEFAULT 1000;`);
+            console.log('Column "Daily_Ticket_Limit" added to Fairs table.');
+        } else {
+            console.log('Column "Daily_Ticket_Limit" already exists in Fairs table.');
+        }
+
+        console.log('Database fix complete.');
+
     } catch (e) {
-        console.error('Error:', e);
+        console.error('Error during database fix:', e.message);
     } finally {
         await sequelize.close();
+        process.exit(0);
     }
 }
 fixDb();

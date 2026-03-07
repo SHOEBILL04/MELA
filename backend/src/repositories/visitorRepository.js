@@ -65,6 +65,17 @@ class VisitorRepository {
     async getTicketsByVisitor(visitor_id) {
         return await Ticket.findAll({ where: { Visitor_ID: visitor_id } });
     }
+
+    async deleteTicket(ticket_id) {
+        const ticket = await Ticket.findByPk(ticket_id);
+        if (!ticket) return null;
+        await ticket.destroy();
+        return true;
+    }
+
+    async getAllTickets() {
+        return await Ticket.findAll();
+    }
 }
 
 module.exports = new VisitorRepository();
