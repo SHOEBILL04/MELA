@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
-const Fair = require('./Fair');
 
 const Event = sequelize.define('Event', {
     Event_ID: {
@@ -13,28 +12,21 @@ const Event = sequelize.define('Event', {
         allowNull: false
     },
     Event_Type: {
-        type: DataTypes.STRING(50),
-        allowNull: true
+        type: DataTypes.STRING(50)
     },
     Event_Date: {
         type: DataTypes.DATEONLY,
         allowNull: false
     },
     Start_Time: {
-        type: DataTypes.TIME,
-        allowNull: true
+        type: DataTypes.TIME
     },
     End_Time: {
-        type: DataTypes.TIME,
-        allowNull: true
+        type: DataTypes.TIME
     },
     Fair_ID: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Fair,
-            key: 'Fair_ID'
-        }
+        allowNull: false
     },
     Organizer_ID: {
         type: DataTypes.INTEGER,

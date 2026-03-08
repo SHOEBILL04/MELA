@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
-const Visitor = require('./Visitor');
 
 const Ticket = sequelize.define('Ticket', {
     Ticket_ID: {
@@ -22,11 +21,7 @@ const Ticket = sequelize.define('Ticket', {
     },
     Visitor_ID: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Visitor,
-            key: 'Visitor_ID'
-        }
+        allowNull: false
     },
     Fair_ID: {
         type: DataTypes.INTEGER,
@@ -39,14 +34,7 @@ const Ticket = sequelize.define('Ticket', {
     }
 }, {
     tableName: 'Tickets',
-    timestamps: false,
-    hooks: {
-        beforeValidate: (ticket, options) => {
-            if (ticket.Status === undefined || ticket.Status === null) {
-                ticket.Status = 'Booked';
-            }
-        }
-    }
+    timestamps: false
 });
 
 module.exports = Ticket;

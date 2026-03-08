@@ -21,14 +21,7 @@ const Fair = sequelize.define('Fair', {
     },
     End_Date: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
-        validate: {
-            isValidDate(value) {
-                if (value < this.Start_Date) {
-                    throw new Error('End_Date must be greater than or equal to Start_Date');
-                }
-            }
-        }
+        allowNull: false
     },
     Organizer_ID: {
         type: DataTypes.INTEGER,
@@ -38,14 +31,19 @@ const Fair = sequelize.define('Fair', {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1000
+    },
+    Max_Stalls: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 50
     }
 }, {
     tableName: 'Fairs',
     timestamps: false,
-    hooks: {
-        beforeValidate: (fair, options) => {
-            if (fair.Daily_Ticket_Limit === undefined || fair.Daily_Ticket_Limit === null) {
-                fair.Daily_Ticket_Limit = 1000;
+    validate: {
+        checkEndDate() {
+            if (this.End_Date < this.Start_Date) {
+                throw new Error('End Date must be greater than or equal to Start Date');
             }
         }
     }

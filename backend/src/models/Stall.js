@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
-const Fair = require('./Fair');
 
 const Stall = sequelize.define('Stall', {
     Stall_ID: {
@@ -22,11 +21,7 @@ const Stall = sequelize.define('Stall', {
     },
     Fair_ID: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Fair,
-            key: 'Fair_ID'
-        }
+        allowNull: false
     },
     Vendor_ID: {
         type: DataTypes.INTEGER,
