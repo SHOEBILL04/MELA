@@ -1,4 +1,3 @@
--- 01_schema.sql
 -- Database Schema for Fair Management System
 -- Entities: Fair, Stall, Vendor, Visitor, Ticket, Employee, Event
 
@@ -31,6 +30,7 @@ CREATE TABLE dbo.Fairs (
     End_Date DATE NOT NULL,
     Organizer_ID INT NOT NULL,
     Daily_Ticket_Limit INT NOT NULL DEFAULT 1000,
+    Max_Stalls INT NOT NULL DEFAULT 50,
     CHECK (End_Date >= Start_Date),
     CONSTRAINT FK_Fairs_Users FOREIGN KEY (Organizer_ID) REFERENCES dbo.Users(User_ID)
 );
@@ -85,13 +85,16 @@ CREATE TABLE dbo.Tickets (
 CREATE TABLE dbo.Employees (
     Employee_ID INT IDENTITY(1,1) PRIMARY KEY,
     Employee_Name NVARCHAR(100) NOT NULL,
-    Role NVARCHAR(50) NOT NULL, -- 'Security', 'Cleaner', 'Manager'
+    Role NVARCHAR(50) NOT NULL,
     Phone_Number NVARCHAR(20),
     Salary DECIMAL(10, 2) NOT NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Pending',
     Fair_ID INT NOT NULL,
     User_ID INT NOT NULL,
+    Stall_ID INT NULL,
     CONSTRAINT FK_Employees_Fairs FOREIGN KEY (Fair_ID) REFERENCES dbo.Fairs(Fair_ID),
-    CONSTRAINT FK_Employees_Users FOREIGN KEY (User_ID) REFERENCES dbo.Users(User_ID)
+    CONSTRAINT FK_Employees_Users FOREIGN KEY (User_ID) REFERENCES dbo.Users(User_ID),
+    CONSTRAINT FK_Employees_Stalls FOREIGN KEY (Stall_ID) REFERENCES dbo.Stalls(Stall_ID)
 );
 
 -- 7. Event Table

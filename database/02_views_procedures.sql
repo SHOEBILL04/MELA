@@ -17,7 +17,6 @@ FROM dbo.Fairs f;
 GO
 
 -- Procedure: AddVisitor
--- Helper to register a visitor
 IF OBJECT_ID('dbo.sp_AddVisitor', 'P') IS NOT NULL DROP PROCEDURE dbo.sp_AddVisitor;
 GO
 
@@ -25,26 +24,23 @@ CREATE PROCEDURE dbo.sp_AddVisitor
     @Name NVARCHAR(100),
     @Age INT,
     @Gender NVARCHAR(10),
-    @Contact NVARCHAR(20),
-    @User_ID INT -- Added User_ID (Required)
+    @Contact NVARCHAR(20)
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.Visitors (Visitor_Name, Age, Gender, Contact_Number, User_ID)
-    VALUES (@Name, @Age, @Gender, @Contact, @User_ID);
+    INSERT INTO dbo.Visitors (Visitor_Name, Age, Gender, Contact_Number)
+    VALUES (@Name, @Age, @Gender, @Contact);
     
     SELECT SCOPE_IDENTITY() AS Visitor_ID;
 END;
 GO
 
 -- Procedure: BuyTicket
--- Transactional ticket purchase for a visitor
 IF OBJECT_ID('dbo.sp_BuyTicket', 'P') IS NOT NULL DROP PROCEDURE dbo.sp_BuyTicket;
 GO
 
 CREATE PROCEDURE dbo.sp_BuyTicket
     @Visitor_ID INT,
-    @Fair_ID INT, -- Added Fair_ID (Required)
     @Ticket_Type NVARCHAR(50),
     @Price DECIMAL(10, 2),
     @Visit_Date DATE
@@ -59,8 +55,9 @@ BEGIN
         RETURN;
     END
 
-    INSERT INTO dbo.Tickets (Visitor_ID, Fair_ID, Ticket_Type, Price, Visit_Date)
-    VALUES (@Visitor_ID, @Fair_ID, @Ticket_Type, @Price, @Visit_Date);
+
+    INSERT INTO dbo.Tickets (Visitor_ID, Ticket_Type, Price, Visit_Date)
+    VALUES (@Visitor_ID, @Ticket_Type, @Price, @Visit_Date);
 
     SELECT 1 AS Success, SCOPE_IDENTITY() AS Ticket_ID;
 END;

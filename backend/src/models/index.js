@@ -44,6 +44,10 @@ Ticket.belongsTo(Fair, { foreignKey: 'Fair_ID' });
 Fair.hasMany(Employee, { foreignKey: 'Fair_ID' });
 Employee.belongsTo(Fair, { foreignKey: 'Fair_ID' });
 
+// Stall and Employee (1:N)
+Stall.hasMany(Employee, { foreignKey: 'Stall_ID', onDelete: 'NO ACTION' });
+Employee.belongsTo(Stall, { foreignKey: 'Stall_ID', onDelete: 'NO ACTION' });
+
 // Fair and Event (1:N)
 Fair.hasMany(Event, { foreignKey: 'Fair_ID' });
 Event.belongsTo(Fair, { foreignKey: 'Fair_ID' });

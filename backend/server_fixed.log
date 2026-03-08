@@ -238,3 +238,11 @@ Successfully Connected to MSSQL Database using Sequelize: MELADB
 Database synchronized.
 Server running on port 5000
 [32m[nodemon] clean exit - waiting for changes before restart[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+[dotenv@17.2.3] injecting env (5) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+Successfully Connected to MSSQL Database using Sequelize: MELADB
+Database synchronized.
+Server running on port 5000
+[32m[nodemon] clean exit - waiting for changes before restart[39m

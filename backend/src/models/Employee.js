@@ -24,6 +24,15 @@ const Employee = sequelize.define('Employee', {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     },
+    User_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    Status: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        defaultValue: 'Pending'
+    },
     Fair_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -32,9 +41,13 @@ const Employee = sequelize.define('Employee', {
             key: 'Fair_ID'
         }
     },
-    User_ID: {
+    Stall_ID: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true,
+        references: {
+            model: 'Stalls',
+            key: 'Stall_ID'
+        }
     }
 }, {
     tableName: 'Employees',
