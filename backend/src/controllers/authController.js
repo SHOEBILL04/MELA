@@ -3,8 +3,8 @@ const { User, Vendor, Employee } = require('../models');
 exports.register = async (req, res) => {
     const { Email, Password, Role, Name, Phone_Number, Address, Salary } = req.body;
 
-    // Restrict roles to Admin, Vendor, Employee
-    if (!['Admin', 'Vendor', 'Employee'].includes(Role)) {
+    // Restrict roles to Admin, Vendor, Employee, Visitor
+    if (!['Admin', 'Vendor', 'Employee', 'Visitor'].includes(Role)) {
         return res.status(400).json({ message: 'Invalid role specified' });
     }
 
@@ -38,6 +38,13 @@ exports.register = async (req, res) => {
                 Phone_Number: Phone_Number || null,
                 Salary: Salary || 0,
                 Status: 'Pending'
+            });
+        } else if (Role === 'Visitor') {
+            const { Visitor } = require('../models');
+            await Visitor.create({
+                User_ID: newUser.User_ID,
+                Visitor_Name: Name || 'Anonymous',
+                Contact_Number: Phone_Number || null
             });
         } // Admin role simply creates a User record, requiring no secondary profile
 
