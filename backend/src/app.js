@@ -5,7 +5,9 @@ const authRoutes = require('./routes/authRoutes');
 const stallRoutes = require('./routes/stallRoutes');
 const fairRoutes = require('./routes/fairRoutes');
 const visitorRoutes = require('./routes/visitorRoutes');
-
+const eventRoutes = require('./routes/eventRoutes');
+const ticketRoutes = require('./routes/ticketRoutes');
+const employeeRoutes = require('./routes/employeeRoutes');
 const app = express();
 
 // Middleware
@@ -18,7 +20,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/stalls', stallRoutes);
 app.use('/api/fairs', fairRoutes);
 app.use('/api/visitors', visitorRoutes);
-
+app.use('/api/events', eventRoutes);
+app.use('/api/tickets', ticketRoutes);
+app.use('/api/employees', employeeRoutes);
 app.get('/', (req, res) => {
     res.send('MELA API is running...');
 });

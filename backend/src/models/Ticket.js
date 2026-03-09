@@ -21,9 +21,13 @@ const Ticket = sequelize.define('Ticket', {
     },
     Visitor_ID: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
     },
     Fair_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    Event_ID: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
