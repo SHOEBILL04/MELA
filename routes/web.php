@@ -13,3 +13,7 @@ Route::prefix('admin')->group(function () {
 });
 // Vendor Stall Kinar Route (Issue 12)
 Route::post('/buy-stall', [VendorController::class, 'buyStall']);
+// Issue 13: Frontend Page Dekhar Route
+Route::get('/buy-stall-page', function () {
+    return view('buy_stall');
+});
