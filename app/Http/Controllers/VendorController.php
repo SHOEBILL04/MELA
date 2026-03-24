@@ -40,4 +40,42 @@ class VendorController extends Controller
             ], 400);
         }
     }
+    // Issue 13: Vendor posts a new employee position
+    public function postEmployeePosition(Request $request)
+    {
+        
+        $stallId = $request->input('stall_id');
+        $title = $request->input('title');
+        $salary = $request->input('salary');
+
+        try {
+            $inserted = \DB::insert("
+                INSERT INTO employee_positions (stall_id, title, salary, status)
+                SELECT ?, ?, ?, 'open'
+                WHERE (
+                    SELECT COUNT(*) FROM employee_positions WHERE stall_id = ?
+                ) < (
+                    SELECT max_employees FROM stalls WHERE stall_id = ?
+                )
+            ", [$stallId, $title, $salary, $stallId, $stallId]);
+
+            if ($inserted) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => "Job role '{$title}' posted successfully!"
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot create position. Maximum employee limit reached for this stall!'
+                ], 400);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
