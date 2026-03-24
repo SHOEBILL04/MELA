@@ -40,4 +40,25 @@ class VendorController extends Controller
             ], 400);
         }
     }
+    // Vendor-er nijer kena stall gulo dekhanor function
+    public function getMyStalls()
+    {
+        // dummy
+        $vendorId = 2; 
+
+        try {
+            
+            $myStalls = \DB::select("SELECT stall_id, stall_number, category, price, status FROM stalls WHERE vendor_id = ?", [$vendorId]);
+            
+            return response()->json([
+                'status' => 'success',
+                'data' => $myStalls
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
