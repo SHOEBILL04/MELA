@@ -40,4 +40,21 @@ class VendorController extends Controller
             ], 400);
         }
     }
+    public function getAllStalls()
+{
+    try {
+        
+        $stalls = DB::select("SELECT stall_id, stall_number, status FROM stalls");
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $stalls
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
 }
