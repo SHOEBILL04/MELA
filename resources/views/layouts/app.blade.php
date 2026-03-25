@@ -39,9 +39,6 @@
                                     <a href="{{ route('admin.fairs.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.fairs.*') ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out">
                                         Manage Fairs
                                     </a>
-                                    <a href="{{ route('admin.bids.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.bids.*') ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out">
-                                        Stall Bids
-                                    </a>
                                 @endif
                                 @if(auth()->user()->role === 'vendor')
                                     <a href="{{ route('vendor.fairs') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('vendor.fairs') ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out">

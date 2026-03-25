@@ -68,7 +68,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="total_stalls" class="block text-sm font-semibold text-slate-700 mb-1.5">Total Stalls Capacity</label>
                         <input type="number" id="total_stalls" name="total_stalls" value="{{ old('total_stalls') }}" required min="1" autocomplete="off"
@@ -83,6 +83,26 @@
                         <input type="number" id="default_limit" name="default_limit" value="{{ old('default_limit') }}" required min="1" autocomplete="off"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm @error('default_limit') border-red-300 ring-red-200 @enderror">
                         @error('default_limit')
+                            <p class="mt-1.5 text-xs text-red-600 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="default_stall_price" class="block text-sm font-semibold text-slate-700 mb-1.5">Default Stall Price ($)</label>
+                        <input type="number" id="default_stall_price" name="default_stall_price" value="{{ old('default_stall_price', '500.00') }}" step="0.01" required min="1" autocomplete="off"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm @error('default_stall_price') border-red-300 ring-red-200 @enderror">
+                        @error('default_stall_price')
+                            <p class="mt-1.5 text-xs text-red-600 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div>
+                        <label for="default_ticket_price" class="block text-sm font-semibold text-slate-700 mb-1.5">Default Visitor Ticket Price ($)</label>
+                        <input type="number" id="default_ticket_price" name="default_ticket_price" value="{{ old('default_ticket_price', '50.00') }}" step="0.01" required min="0" autocomplete="off"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm @error('default_ticket_price') border-red-300 ring-red-200 @enderror">
+                        @error('default_ticket_price')
                             <p class="mt-1.5 text-xs text-red-600 font-medium">{{ $message }}</p>
                         @enderror
                     </div>

@@ -44,15 +44,14 @@ class FairController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'total_stalls' => 'required|integer|min:1',
             'default_limit' => 'required|integer|min:1',
+            'default_stall_price' => 'required|numeric|min:0',
+            'default_ticket_price' => 'required|numeric|min:0',
         ]);
 
         try {
-            // Call the stored procedure using DB::select to catch the returned NewFairID
-            // Note: Since we are in the initial setup, we might manually pass an admin_id if Auth is not ready.
-            // For now, let's assume we use the authenticated user or a default admin (id=1).
             $adminId = Auth::id() ?? 1;
 
-            $result = DB::select('EXEC usp_CreateFair ?, ?, ?, ?, ?, ?, ?', [
+            $result = DB::select('EXEC usp_CreateFair ?, ?, ?, ?, ?, ?, ?, ?, ?', [
                 $adminId,
                 $validated['name'],
                 $validated['location'],
@@ -60,6 +59,8 @@ class FairController extends Controller
                 $validated['end_date'],
                 $validated['total_stalls'],
                 $validated['default_limit'],
+                $validated['default_stall_price'],
+                $validated['default_ticket_price']
             ]);
 
             $newFairId = $result[0]->NewFairID ?? null;
@@ -69,6 +70,32 @@ class FairController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Database Error: ' . $e->getMessage()]);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            // Delete child records first to handle missing ON DELETE CASCADE
+            DB::table('stall_bids')->whereIn('stall_id', function($q) use ($id) {
+                $q->select('stall_id')->from('stalls')->where('fair_id', $id);
+            })->delete();
+            DB::table('employee_positions')->whereIn('stall_id', function($q) use ($id) {
+                $q->select('stall_id')->from('stalls')->where('fair_id', $id);
+            })->delete();
+            DB::table('stalls')->where('fair_id', $id)->delete();
+            DB::table('event_tickets')->whereIn('event_id', function($q) use ($id) {
+                $q->select('event_id')->from('events')->where('fair_id', $id);
+            })->delete();
+            DB::table('events')->where('fair_id', $id)->delete();
+            DB::table('fair_tickets')->where('fair_id', $id)->delete();
+            DB::table('fair_days')->where('fair_id', $id)->delete();
+            
+            DB::table('fairs')->where('fair_id', $id)->delete();
+            
+            return redirect()->route('admin.fairs.index')->with('success', 'Fair deleted successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to delete fair due to constraints. Error: ' . $e->getMessage());
         }
     }
 }

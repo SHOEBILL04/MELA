@@ -10,41 +10,95 @@ class VisitorController extends Controller
 {
     public function browseFairs()
     {
-        // 1. Computed difference expression to show remaining slots for active fairs
-        $fairDays = DB::table('fairs')
-            ->join('fair_days', 'fairs.fair_id', '=', 'fair_days.fair_id')
-            ->selectRaw('
-                fairs.fair_id, 
-                fairs.name, 
-                fairs.location, 
-                fair_days.day_id, 
-                fair_days.day_date, 
-                fair_days.max_visitors, 
-                fair_days.visitors_count, 
-                (fair_days.max_visitors - fair_days.visitors_count) as remaining_slots
-            ')
-            ->whereIn('fairs.status', ['active', 'upcoming'])
-            ->orderBy('fair_days.day_date', 'asc')
+        $fairs = DB::table('fairs')
+            ->whereIn('status', ['active', 'upcoming'])
+            ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('visitor.fairs', compact('fairDays'));
+        return view('visitor.fairs', compact('fairs'));
     }
 
-    public function buyFairTicket(Request $request, $fairId, $dayId)
+    public function fairDays($fair_id)
     {
+        $fair = DB::table('fairs')->where('fair_id', $fair_id)->first();
+        if (!$fair) abort(404);
+
+        $fairDays = DB::table('fair_days')
+            ->where('fair_id', $fair_id)
+            ->selectRaw('
+                day_id, 
+                day_date, 
+                max_visitors, 
+                visitors_count, 
+                (max_visitors - visitors_count) as remaining_slots
+            ')
+            ->orderBy('day_date', 'asc')
+            ->get();
+
+        return view('visitor.fair_days', compact('fair', 'fairDays'));
+    }
+
+    public function buyFairTicketsBulk(Request $request)
+    {
+        $request->validate([
+            'fair_id' => 'required|integer',
+            'day_id' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
         $user = Auth::user();
-        $ticketPrice = 50.00; // Hardcoded default for the app logic simplicity
+        $fairId = $request->fair_id;
+        $dayId = $request->day_id;
+        $qty = $request->quantity;
+
+        // Fetch ticket price from fair
+        $ticketPrice = DB::table('fairs')->where('fair_id', $fairId)->value('default_ticket_price') ?? 50.00;
 
         try {
-            DB::statement("EXEC usp_BuyFairTicket @visitor_id = ?, @fair_id = ?, @day_id = ?, @ticket_price = ?", [
-                $user->user_id,
-                $fairId,
-                $dayId,
-                $ticketPrice
+            DB::beginTransaction();
+
+            // Lock the fair_day for update to prevent overselling race conditions
+            $day = DB::table('fair_days')
+                ->where('day_id', $dayId)
+                ->where('fair_id', $fairId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$day) {
+                throw new \Exception("Invalid fair day.");
+            }
+
+            $remaining = $day->max_visitors - $day->visitors_count;
+            if ($remaining < $qty) {
+                DB::rollBack();
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Purchase failed. Only $remaining tickets available for this day."
+                ], 400);
+            }
+
+            // Loop and execute procedure N times
+            for ($i = 0; $i < $qty; $i++) {
+                DB::statement("SET NOCOUNT ON; EXEC usp_BuyFairTicket @visitor_id = ?, @fair_id = ?, @day_id = ?, @ticket_price = ?", [
+                    $user->user_id,
+                    $fairId,
+                    $dayId,
+                    $ticketPrice
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => "$qty Tickets purchased successfully!"
             ]);
-            return back()->with('success', 'Fair ticket purchased successfully!');
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Purchase failed: ' . $e->getMessage());
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Purchase failed: ' . $e->getMessage()
+            ], 400);
         }
     }
 

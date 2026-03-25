@@ -30,6 +30,8 @@ Route::middleware(['auth'])->get('/dashboard', function () {
 Route::middleware(['auth', 'role:visitor'])->prefix('visitor')->name('visitor.')->group(function () {
     Route::get('/dashboard', function() { return redirect()->route('visitor.fairs'); })->name('dashboard');
     Route::get('/fairs', [VisitorController::class, 'browseFairs'])->name('fairs');
+    Route::get('/fairs/{fair_id}/days', [VisitorController::class, 'fairDays'])->name('fair_days');
+    Route::post('/buy-fair-tickets-bulk', [VisitorController::class, 'buyFairTicketsBulk'])->name('buy_fair_tickets_bulk');
     Route::post('/fair/buy/{fairId}/{dayId}', [VisitorController::class, 'buyFairTicket'])->name('buyFairTicket');
     Route::get('/events', [VisitorController::class, 'browseEvents'])->name('events');
     Route::post('/event/buy/{eventId}', [VisitorController::class, 'buyEventTicket'])->name('buyEventTicket');
@@ -48,10 +50,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/fairs/create', [FairController::class, 'create'])->name('admin.fairs.create');
     Route::post('/fairs', [FairController::class, 'store'])->name('admin.fairs.store');
     Route::get('/fairs/{id}', [FairController::class, 'show'])->name('admin.fairs.show');
-
-    Route::get('/bids', [\App\Http\Controllers\Admin\BidController::class, 'index'])->name('admin.bids.index');
-    Route::post('/bids/{id}/approve', [\App\Http\Controllers\Admin\BidController::class, 'approve'])->name('admin.bids.approve');
-    Route::post('/bids/{id}/reject', [\App\Http\Controllers\Admin\BidController::class, 'reject'])->name('admin.bids.reject');
+    Route::delete('/fairs/{id}', [FairController::class, 'destroy'])->name('admin.fairs.destroy');
 });
 
 // Vendor Routes
@@ -59,6 +58,6 @@ Route::middleware(['auth'])->prefix('vendor')->name('vendor.')->group(function (
     Route::get('/fairs', [VendorController::class, 'fairs'])->name('fairs');
     Route::get('/stalls/{fair_id}', [VendorController::class, 'stalls'])->name('stalls');
     Route::get('/api/stalls/{fair_id}', [VendorController::class, 'getAllStalls']);
-    Route::get('/buy-stall-page', [VendorController::class, 'buyStallPage'])->name('buy_stall_page');
     Route::post('/buy-stall', [VendorController::class, 'buyStall'])->name('buy_stall');
+    Route::post('/buy-stalls-bulk', [VendorController::class, 'buyStallsBulk'])->name('buy_stalls_bulk');
 });
