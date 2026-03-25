@@ -17,3 +17,7 @@ Route::post('/buy-stall', [VendorController::class, 'buyStall']);
 Route::get('/buy-stall-page', function () {
     return view('buy_stall');
 });
+Route::get('/get-all-stalls', [App\Http\Controllers\VendorController::class, 'getAllStalls']);
+Route::get('/dashboard', function () {
+    return view('stall_dashboard');
+});
