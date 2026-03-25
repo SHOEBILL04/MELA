@@ -9,6 +9,21 @@ use Illuminate\Support\Facades\Auth;
 
 class FairController extends Controller
 {
+    public function index()
+    {
+        $fairs = DB::table('vw_FairSummary')->orderBy('fair_id', 'desc')->get();
+        return view('admin.fairs.index', compact('fairs'));
+    }
+
+    public function show($id)
+    {
+        $fair = DB::table('vw_FairSummary')->where('fair_id', $id)->first();
+        if (!$fair) {
+            abort(404);
+        }
+        return view('admin.fairs.show', compact('fair'));
+    }
+
     /**
      * Show the form for creating a new fair.
      */
@@ -49,7 +64,7 @@ class FairController extends Controller
 
             $newFairId = $result[0]->NewFairID ?? null;
 
-            return redirect()->route('admin.fairs.create')
+            return redirect()->route('admin.fairs.show', $newFairId)
                 ->with('success', "Fair created successfully! New Fair ID: $newFairId");
 
         } catch (\Exception $e) {

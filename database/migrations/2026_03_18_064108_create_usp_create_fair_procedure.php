@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations. [cite: 54]
+     * Run the migrations.
      */
     public function up(): void
     {
@@ -15,7 +15,7 @@ return new class extends Migration
             return;
         }
 
-        // 1. Drop the procedure if it already exists to avoid "Already Exists" errors [cite: 60]
+        // 1. Drop the procedure if it already exists to avoid "Already Exists" errors
         DB::unprepared("IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'usp_CreateFair')
                         DROP PROCEDURE usp_CreateFair");
 
@@ -25,7 +25,7 @@ return new class extends Migration
         if (file_exists($path)) {
             $sql = file_get_contents($path);
             if (!empty(trim($sql))) {
-                DB::unprepared($sql); // This actually creates the procedure in MSSQL [cite: 60]
+                DB::unprepared($sql); // This actually creates the procedure in MSSQL
             }
         }
     }
@@ -39,7 +39,7 @@ return new class extends Migration
             return;
         }
 
-        // Remove the logic if you rollback the migration [cite: 131]
+        // Remove the logic if you rollback the migration
         DB::unprepared("DROP PROCEDURE IF EXISTS usp_CreateFair");
     }
 };

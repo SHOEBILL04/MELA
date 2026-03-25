@@ -1,148 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>MELA - Buy Your Perfect Stall</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-bg: #01040a; 
-            --secondary-bg: #021d4d; 
-            --glass-bg: rgba(255, 255, 255, 0.1); /* Opacity baralam */
-            --glass-border: rgba(0, 210, 255, 0.3); /* Border cyan joljol korbe */
-            --input-bg: rgba(255, 255, 255, 0.12); 
-            --text-main: #ffffff;
-            --text-dim: #b0c4de;
-            --accent: #00f2ff; /* Pura neon cyan */
-        }
+@extends('layouts.app', ['header' => 'Buy Your Perfect Stall'])
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top right, var(--secondary-bg), var(--primary-bg));
-            min-height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center;
-        }
-
-        .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            padding: 45px; border-radius: 28px;
-            border: 1px solid var(--glass-border);
-            width: 100%; max-width: 420px;
-            box-shadow: 0 0 40px rgba(0, 210, 255, 0.15); /* Outer glow added */
-        }
-
-        .mela-logo { 
-            font-family: 'Poppins', sans-serif; font-size: 36px; font-weight: 700;
-            background: linear-gradient(to right, #00f2ff, #3a7bd5);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; /* Logo-ta gradient joljole */
-            letter-spacing: 3px; 
-        }
-
-        input {
-            width: 100%; padding: 15px 15px 15px 45px;
-            background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 14px; color: #fff; font-size: 16px; box-sizing: border-box;
-            transition: 0.3s;
-        }
-
-        input:focus { 
-            outline: none; border-color: var(--accent); 
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); /* Focus glow baralam */
-        }
-
-        button {
-            width: 100%; padding: 18px;
-            background: linear-gradient(135deg, #00f2ff, #0072ff);
-            border: none; border-radius: 14px; color: #fff; font-weight: 700; font-size: 18px;
-            cursor: pointer; transition: 0.4s; display: flex; align-items: center;
-            justify-content: center; gap: 12px; margin-top: 15px;
-            box-shadow: 0 8px 25px rgba(0, 242, 255, 0.3); /* Button-er nicher glow */
-        }
-
-        button:hover { transform: scale(1.03); box-shadow: 0 12px 30px rgba(0, 242, 255, 0.5); }
-    </style>
-</head>
-<body>
-
-    <div class="card">
-        <div class="card-header">
-            <h1 class="mela-logo">MELA</h1>
-            <div class="card-title">Buy Your Perfect Stall</div>
-        </div>
-        
-        <div class="form-group">
-            <label>Vendor ID</label>
-            <div class="input-wrapper">
-                <i class="fas fa-user"></i>
-                <input type="number" id="vendor_id" placeholder="e.g. 2">
+@section('content')
+<div class="max-w-xl mx-auto">
+    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+        <form id="buyStallForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="vendor_id">Vendor ID</label>
+                <input type="number" id="vendor_id" value="{{ auth()->user()->id }}" readonly
+                    class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500 cursor-not-allowed">
+                <p class="mt-1 text-xs text-slate-400">Your Vendor ID is auto-filled.</p>
             </div>
-        </div>
-        
-        <div class="form-group">
-            <label>Stall ID</label>
-            <div class="input-wrapper">
-                <i class="fas fa-store"></i>
-                <input type="number" id="stall_id" placeholder="e.g. 7">
+            
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Proposed Bid Amount ($)</label>
+                <input type="number" id="bid_amount" step="0.01" min="1" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-black text-slate-800" placeholder="e.g. 500.00">
             </div>
-        </div>
-        
-        <button id="buyBtn" onclick="buyStall()">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Buy Now</span>
-        </button>
 
-        <p id="message"></p>
+            <button type="submit" id="submitBidBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
+                Submit Bid Proposal
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </button>
+            <div id="message" class="text-sm font-medium text-center mt-4 hidden p-3 rounded-md"></div>
+        </form>
     </div>
+</div>
 
-    <script>
-        async function buyStall() {
-            const vId = document.getElementById('vendor_id').value;
-            const sId = document.getElementById('stall_id').value;
-            const msgBox = document.getElementById('message');
-            const btn = document.getElementById('buyBtn');
+<script>
+// Make stall_id available in JS
+const stallId = {{ $stall_id }};
 
-            if(!vId || !sId) {
-                msgBox.style.color = '#ff6b6b';
-                msgBox.innerHTML = "Please fill in all fields!";
-                return;
-            }
+async function submitBid(event) {
+    event.preventDefault(); // Prevent default form submission
 
-            btn.disabled = true;
-            msgBox.style.color = '#00d2ff';
-            msgBox.innerHTML = "Processing...";
+    const vendorId = document.getElementById('vendor_id').value;
+    const bidAmountStr = document.getElementById('bid_amount').value;
+    const msgBox = document.getElementById('message');
+    const btn = document.getElementById('submitBidBtn');
 
-            try {
-                const response = await fetch('/buy-stall', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ vendor_id: parseInt(vId), stall_id: parseInt(sId) })
-                });
+    const bidAmount = parseFloat(bidAmountStr);
 
-                const data = await response.json();
+    if (isNaN(bidAmount) || bidAmount <= 0) {
+        msgBox.className = "mt-4 p-4 rounded-xl text-sm font-bold bg-red-50 text-red-600 border border-red-100 flex items-center gap-2 block";
+        msgBox.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Please enter a valid bid amount.';
+        return;
+    }
 
-                if (response.ok) {
-                    msgBox.style.color = '#51cf66';
-                    msgBox.innerHTML = "🎉 " + data.message;
-                    document.getElementById('vendor_id').value = '';
-                    document.getElementById('stall_id').value = '';
-                } else {
-                    msgBox.style.color = '#ff6b6b';
-                    msgBox.innerHTML = "❌ " + (data.message || "Failed!");
-                }
-            } catch (error) {
-                msgBox.style.color = '#ff6b6b';
-                msgBox.innerHTML = "❌ Server Error! Port 9000 chalu ache to?";
-            } finally {
-                btn.disabled = false;
-            }
+    btn.disabled = true;
+    btn.classList.add('opacity-75', 'cursor-wait');
+    msgBox.className = "text-sm font-medium text-center mt-4 p-3 rounded-md bg-blue-50 text-blue-600 border border-blue-100 block";
+    msgBox.innerHTML = "Processing bid...";
+
+    try {
+        const response = await fetch('/vendor/buy-stall', { // Assuming the route remains the same for now
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                vendor_id: parseInt(vendorId),
+                stall_id: parseInt(stallId),
+                bid_amount: bidAmount
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) { // Check for HTTP success status (2xx)
+            msgBox.className = "mt-4 p-4 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center gap-2 block";
+            msgBox.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> ${result.message}`;
+            setTimeout(() => { window.location.href = '/vendor/fairs'; }, 2000);
+        } else {
+            msgBox.className = "mt-4 p-4 rounded-xl text-sm font-bold bg-red-50 text-red-600 border border-red-100 flex items-center gap-2 block";
+            msgBox.innerHTML = `❌ ${result.message || "Bid submission failed!"}`;
         }
-    </script>
-</body>
-</html>
+    } catch (error) {
+        msgBox.className = "mt-4 p-4 rounded-xl text-sm font-bold bg-red-50 text-red-600 border border-red-100 flex items-center gap-2 block";
+        msgBox.innerHTML = "❌ Server Connection Error.";
+    } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75', 'cursor-wait');
+    }
+}
+</script>
+@endsection

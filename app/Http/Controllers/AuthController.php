@@ -79,16 +79,6 @@ class AuthController extends Controller
 
     protected function redirectBasedOnRole($role)
     {
-        switch ($role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'vendor':
-                return redirect()->route('vendor.dashboard');
-            case 'employee':
-                return redirect()->route('employee.dashboard');
-            case 'visitor':
-            default:
-                return redirect()->route('visitor.dashboard');
-        }
+        return redirect()->route('dashboard');
     }
 }

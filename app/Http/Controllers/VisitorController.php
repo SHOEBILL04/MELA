@@ -23,7 +23,7 @@ class VisitorController extends Controller
                 fair_days.visitors_count, 
                 (fair_days.max_visitors - fair_days.visitors_count) as remaining_slots
             ')
-            ->where('fairs.status', 'active')
+            ->whereIn('fairs.status', ['active', 'upcoming'])
             ->orderBy('fair_days.day_date', 'asc')
             ->get();
 

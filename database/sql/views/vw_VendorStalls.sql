@@ -7,7 +7,7 @@ SELECT
     u.name AS vendor_name,
     s.category,
     s.price AS stall_price,
-    -- Koyjon employee approved obosthay ache ta count kora hocche [cite: 106]
+    -- Koyjon employee approved obosthay ache ta count kora hocche
     (SELECT COUNT(*) FROM employee_positions ep 
      WHERE ep.stall_id = s.stall_id AND ep.status = 'filled') AS employee_count
 FROM stalls s

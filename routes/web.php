@@ -8,17 +8,20 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\Admin\FairController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
 // Authentication Routes
-Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+});
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Global Dashboard Route (লগইন করার পর এখানে আসবে)
+// Global Dashboard Route
 Route::middleware(['auth'])->get('/dashboard', function () {
     return view('dashboard'); 
 })->name('dashboard');
@@ -40,18 +43,22 @@ Route::middleware(['auth', 'role:employee'])->prefix('employee')->name('employee
     Route::get('/history', [EmployeeController::class, 'viewHistory'])->name('history');
 });
 
-// Admin Routes
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/fairs', [FairController::class, 'index'])->name('admin.fairs.index');
     Route::get('/fairs/create', [FairController::class, 'create'])->name('admin.fairs.create');
     Route::post('/fairs', [FairController::class, 'store'])->name('admin.fairs.store');
+    Route::get('/fairs/{id}', [FairController::class, 'show'])->name('admin.fairs.show');
+
+    Route::get('/bids', [\App\Http\Controllers\Admin\BidController::class, 'index'])->name('admin.bids.index');
+    Route::post('/bids/{id}/approve', [\App\Http\Controllers\Admin\BidController::class, 'approve'])->name('admin.bids.approve');
+    Route::post('/bids/{id}/reject', [\App\Http\Controllers\Admin\BidController::class, 'reject'])->name('admin.bids.reject');
 });
 
 // Vendor Routes
-Route::post('/buy-stall', [VendorController::class, 'buyStall']);
-Route::get('/buy-stall-page', function () {
-    return view('buy_stall');
-});
-Route::get('/get-all-stalls', [App\Http\Controllers\VendorController::class, 'getAllStalls']);
-Route::get('/dashboard', function () {
-    return view('stall_dashboard');
+Route::middleware(['auth'])->prefix('vendor')->name('vendor.')->group(function () {
+    Route::get('/fairs', [VendorController::class, 'fairs'])->name('fairs');
+    Route::get('/stalls/{fair_id}', [VendorController::class, 'stalls'])->name('stalls');
+    Route::get('/api/stalls/{fair_id}', [VendorController::class, 'getAllStalls']);
+    Route::get('/buy-stall-page', [VendorController::class, 'buyStallPage'])->name('buy_stall_page');
+    Route::post('/buy-stall', [VendorController::class, 'buyStall'])->name('buy_stall');
 });
