@@ -25,5 +25,5 @@ SELECT
     ticket_type,
     purchase_date,
     ticket_price,
-    SUM(ticket_price) OVER (PARTITION BY visitor_id ORDER BY purchase_date ROWS UNBOUNDED PRECEDING) as cumulative_spend
+    SUM(ticket_price) OVER (PARTITION BY visitor_id ORDER BY purchase_date, ticket_type, id ROWS UNBOUNDED PRECEDING) as cumulative_spend
 FROM AllTickets;

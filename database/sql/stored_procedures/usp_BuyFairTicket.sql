@@ -45,7 +45,6 @@ BEGIN
         IF @@TRANCOUNT > 0
             ROLLBACK TRAN;
         
-        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
-        RAISERROR(@ErrorMessage, 16, 1);
+        THROW;
     END CATCH
 END;
