@@ -17,7 +17,17 @@ class VendorController extends Controller
     {
         $fair = DB::table('fairs')->where('fair_id', $fair_id)->first();
         if (!$fair) abort(404);
-        return view('stall_dashboard', compact('fair'));
+        
+        $availableCount = DB::table('stalls')
+            ->where('fair_id', $fair_id)
+            ->where('status', 'available')
+            ->count();
+            
+        $stallPrice = DB::table('stalls')
+            ->where('fair_id', $fair_id)
+            ->value('price') ?? 0;
+
+        return view('stall_dashboard', compact('fair', 'availableCount', 'stallPrice'));
     }
 
     public function buyStallPage(Request $request)
@@ -31,38 +41,26 @@ class VendorController extends Controller
         $request->validate([
             'vendor_id' => 'required|integer',
             'stall_id' => 'required|integer',
-            'bid_amount' => 'required|numeric|min:1',
         ]);
 
         try {
-            // Check if stall is still available before accepting bid
-            $stall = DB::table('stalls')->where('stall_id', $request->stall_id)->first();
-            if (!$stall || $stall->status !== 'available') {
-                throw new \Exception('already sold');
-            }
-
-            // Insert Bid
-            DB::table('stall_bids')->insert([
-                'vendor_id' => $request->vendor_id,
-                'stall_id' => $request->stall_id,
-                'bid_amount' => $request->bid_amount,
-                'status' => 'pending',
-                'created_at' => now(),
-                'updated_at' => now(),
+            DB::statement("SET NOCOUNT ON; EXEC usp_BuyStall @vendor_id = ?, @stall_id = ?", [
+                $request->vendor_id, 
+                $request->stall_id
             ]);
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Bid submitted successfully! Pending Admin approval.'
+                'message' => 'Stall purchased and locked successfully!'
             ]);
 
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
 
             if (stripos($errorMessage, 'already sold') !== false || stripos($errorMessage, 'reserved') !== false) {
-                $userFriendlyMessage = "This stall is already sold or reserved!";
+                $userFriendlyMessage = "This stall is already sold or reserved by another vendor!";
             } else {
-                $userFriendlyMessage = "Failed to submit bid: " . $e->getMessage();
+                $userFriendlyMessage = "Failed to buy stall: " . $e->getMessage();
             }
 
             return response()->json([
@@ -75,7 +73,7 @@ class VendorController extends Controller
     public function getAllStalls($fair_id)
     {
         try {
-            $stalls = DB::select("SELECT stall_id, stall_number, status FROM stalls WHERE fair_id = ?", [$fair_id]);
+            $stalls = DB::select("SELECT stall_id, stall_number, status, price FROM stalls WHERE fair_id = ?", [$fair_id]);
             return response()->json([
                 'status' => 'success',
                 'data' => $stalls
@@ -85,6 +83,60 @@ class VendorController extends Controller
                 'status' => 'error',
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function buyStallsBulk(Request $request)
+    {
+        $request->validate([
+            'vendor_id' => 'required|integer',
+            'fair_id' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $vendorId = $request->vendor_id;
+        $fairId = $request->fair_id;
+        $qty = $request->quantity;
+
+        try {
+            DB::beginTransaction();
+            
+            // Get available stalls for this fair with row lock
+            $stalls = DB::table('stalls')
+                ->where('fair_id', $fairId)
+                ->where('status', 'available')
+                ->lockForUpdate()
+                ->limit($qty)
+                ->get();
+
+            if ($stalls->count() < $qty) {
+                DB::rollBack();
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Not enough stalls available. Only ' . $stalls->count() . ' left.'
+                ], 400);
+            }
+
+            foreach ($stalls as $stall) {
+                DB::statement("SET NOCOUNT ON; EXEC usp_BuyStall @vendor_id = ?, @stall_id = ?", [
+                    $vendorId, 
+                    $stall->stall_id
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "$qty Stalls secured successfully!"
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => "Failed to purchase stalls: " . $e->getMessage()
+            ], 400);
         }
     }
 }

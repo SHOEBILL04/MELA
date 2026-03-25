@@ -1,4 +1,4 @@
-CREATE PROCEDURE usp_BuyStall
+CREATE OR ALTER PROCEDURE usp_BuyStall
     @vendor_id INT,
     @stall_id INT
 AS
@@ -44,4 +44,3 @@ BEGIN
         RAISERROR(@ErrorMessage, 16, 1);
     END CATCH
 END;
-GO

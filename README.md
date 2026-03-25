@@ -1,59 +1,83 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="300" alt="Laravel Logo">
+    <h1>Mela Fair Management System</h1>
+    <p>A comprehensive, database-first platform for managing large-scale cultural fairs, stall bookings, and ticketing operations.</p>
+</div>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## 🚀 Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The **Mela Fair Management System** is a robust web application tailored to handle the complex logistical requirements of cultural festivals and fairs. Built on a stringent **Database-First Architecture**, it offloads critical concurrency checks and business logic down to the SQL Server layer via Stored Procedures and Triggers, ensuring maximum data integrity even during high-traffic checkout surges.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🎯 Key Features by Role
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 👑 Administrator
+- **Fair Deployment Engine**: Create new interactive fairs. The system automatically provisions and maps structural database records (Available Stalls, Operating Fair Days, etc.) in the background.
+- **Dynamic Pricing Controls**: Define global base prices for stall leases and visitor admission tickets simultaneously upon fair creation.
+- **Deep Analytics**: Instantly monitor revenue and foot traffic across all operating fairs via highly optimized SQL Views.
+- **Cascade Demolition**: Safely delete entire fair structures with secure cascading constraints.
 
-## Learning Laravel
+### 🏪 Vendor
+- **Live Inventory Market**: Discover active and upcoming Mela Fairs locally.
+- **Interactive Stall Booking**: Choose your desired fair and view real-time stall capacity and lease prices.
+- **High-Concurrency Bulk Checkout**: Seamlessly reserve massive blocks of stalls at once. Powered by `UPDLOCK` and `ROWLOCK`, guaranteeing accurate allocation without overselling.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 🎟️ Visitor
+- **Date-Specific Planning**: Browse all upcoming fairs, organized hierarchically by specific active operating dates.
+- **Availability Matrix**: Check real-time MELA remaining admission capacities for any given day.
+- **Bulk Ticketing**: Secure admission for entire groups in one seamless transaction.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 👷 Employee
+- **Job Recruitment Portal**: Browse local job openings at active fairs.
+- **Direct Application**: Apply directly for positions via secure SQL stored procedures.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🛠️ Technology Stack
 
-### Premium Partners
+- **Backend Framework**: [Laravel 11](https://laravel.com/) (PHP)
+- **Database Engine**: Microsoft SQL Server
+- **Frontend Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Architecture**: Database-First (SPs, Triggers, Views)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🗄️ Database Architecture
 
-## Contributing
+At the heart of Mela is a strict Database-First philosophy. The Laravel backend primarily acts as a routing orchestrator, delegating heavy lifting to SQL Server:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Stored Procedures**: `usp_CreateFair`, `usp_BuyStall`, `usp_BuyFairTicket`, `usp_RecruitEmployee`
+- **Preventative Triggers**: `trg_PreventEventOversell`, `trg_StallSoldCountUpdate`, `trg_PreventDuplicateApplication`
+- **Analytical Views**: `vw_FairSummary`, `vw_DailyVisitorCount`, `vw_VisitorTickets`
 
-## Code of Conduct
+All financial checkout procedures utilize **Transaction Scopes** and **Row-level locking (`UPDLOCK, ROWLOCK`)** to prevent race conditions during peak purchase bursts.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 💻 Installation
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   composer install
+   npm install
+   ```
+3. Copy `.env.example` to `.env` and configure your **SQL Server** database connection.
+4. Generate the application key:
+   ```bash
+   php artisan key:generate
+   ```
+5. Run the migration engine (this deploys tables, constraints, triggers, and all SPs):
+   ```bash
+   php artisan migrate
+   ```
+6. Compile modern Tailwind CSS assets:
+   ```bash
+   npm run build
+   ```
+7. Boot the server!
+   ```bash
+   php artisan serve
+   ```
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+*Built to power the next generation of seamless cultural festivals.*
