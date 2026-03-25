@@ -1,6 +1,5 @@
 CREATE VIEW vw_FairSummary AS
 WITH StallStats AS (
-    -- Calculate revenue and count per fair from the stalls table
     SELECT 
         fair_id,
         COUNT(stall_id) AS total_stalls_sold,
@@ -10,7 +9,6 @@ WITH StallStats AS (
     GROUP BY fair_id
 ),
 FairTicketStats AS (
-    -- Calculate revenue from fair entry tickets
     SELECT 
         fair_id,
         COUNT(ticket_id) AS total_visitors,
@@ -19,7 +17,7 @@ FairTicketStats AS (
     GROUP BY fair_id
 ),
 EventTicketStats AS (
-    -- Calculate revenue from event tickets (joined via the events table)
+
     SELECT 
         e.fair_id,
         SUM(et.ticket_price) AS total_event_revenue
