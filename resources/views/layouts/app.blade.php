@@ -37,11 +37,15 @@
                                     <a href="{{ route('vendor.fairs') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('vendor.fairs') ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} text-sm font-medium leading-5 transition ml-8">
                                         Browse Fairs
                                     </a>
+                                    <a href="{{ route('vendor.events') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('vendor.events') ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} text-sm font-medium leading-5 transition ml-8">
+                                        Events
+                                    </a>
                                 @endif
 
                                 @if(auth()->user()->role === 'admin')
                                     <a href="{{ route('admin.fairs.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.fairs.*') ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} text-sm font-medium leading-5 transition">
-                                        Manage Fairs
+                                        
+                                    Manage Fairs
                                     </a>
                                 @endif
 

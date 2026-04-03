@@ -8,23 +8,30 @@
             <p class="text-sm font-medium text-slate-500 mt-1">Browse stalls currently recruiting employees across all active fairs.</p>
         </div>
 
-        <form method="GET" action="{{ route('employee.positions') }}" class="flex items-center gap-3 bg-white p-2 border border-slate-200 rounded-xl shadow-sm">
-            <div class="relative">
-                <select name="fair_status" class="appearance-none pl-4 pr-10 py-2 border-0 bg-transparent text-sm font-medium text-slate-700 focus:ring-0 cursor-pointer">
-                    <option value="all" @selected($statusFilter == 'all')>All Fairs</option>
-                    <option value="upcoming" @selected($statusFilter == 'upcoming')>Upcoming Only</option>
-                    <option value="active" @selected($statusFilter == 'active')>Active Now</option>
-                    <option value="completed" @selected($statusFilter == 'completed')>Completed</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('employee.history') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl font-bold text-sm transition shadow-sm flex items-center gap-2 h-full border border-indigo-700">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                My History
+            </a>
+
+            <form method="GET" action="{{ route('employee.positions') }}" class="flex items-center gap-3 bg-white p-2 border border-slate-200 rounded-xl shadow-sm">
+                <div class="relative">
+                    <select name="fair_status" class="appearance-none pl-4 pr-10 py-2 border-0 bg-transparent text-sm font-medium text-slate-700 focus:ring-0 cursor-pointer">
+                        <option value="all" @selected($statusFilter == 'all')>All Fairs</option>
+                        <option value="upcoming" @selected($statusFilter == 'upcoming')>Upcoming Only</option>
+                        <option value="active" @selected($statusFilter == 'active')>Active Now</option>
+                        <option value="completed" @selected($statusFilter == 'completed')>Completed</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
                 </div>
-            </div>
-            <div class="w-px h-6 bg-slate-200"></div>
-            <button type="submit" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg transition-colors">
-                Apply Filter
-            </button>
-        </form>
+                <div class="w-px h-6 bg-slate-200"></div>
+                <button type="submit" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg transition-colors">
+                    Apply Filter
+                </button>
+            </form>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -39,10 +46,11 @@
                     </div>
 
                     <h3 class="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{{ $pos->title }}</h3>
+                    
                     <p class="text-sm font-medium text-slate-500 mt-1 mb-6 flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         Stall {{ $pos->stall_number }} ({{ $pos->category }})
-                    </button>
+                    </p>
 
                     <div class="bg-slate-50 rounded-lg p-3 border border-slate-100 flex items-center gap-3">
                         <div class="bg-white p-2 rounded shadow-sm border border-slate-200">
@@ -56,13 +64,19 @@
                 </div>
                 
                 <div class="px-6 pb-6 mt-auto">
-                    <form method="POST" action="{{ route('employee.apply', $pos->position_id) }}">
-                        @csrf
-                        <button type="submit" class="w-full bg-slate-900 hover:bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
-                            Quick Apply
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    @if(in_array($pos->position_id, $appliedPositionsArray))
+                        <button disabled class="w-full bg-slate-100 border border-slate-200 text-slate-400 font-bold py-2.5 px-4 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
+                            ✅ Already Applied
                         </button>
-                    </form>
+                    @else
+                        <form method="POST" action="{{ route('employee.apply', $pos->position_id) }}">
+                            @csrf
+                            <button type="submit" class="w-full bg-slate-900 hover:bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
+                                Quick Apply
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
         @empty
