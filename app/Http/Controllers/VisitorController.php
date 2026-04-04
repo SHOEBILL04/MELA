@@ -156,4 +156,25 @@ class VisitorController extends Controller
             return back()->with('error', 'Purchase failed: ' . $e->getMessage());
         }
     }
+
+    public function myTickets()
+    {
+        $userId = Auth::user()->user_id;
+
+        $fairTickets = DB::table('fair_tickets')
+            ->join('fairs', 'fair_tickets.fair_id', '=', 'fairs.fair_id')
+            ->where('fair_tickets.visitor_id', $userId)
+            ->select('fair_tickets.ticket_id as id', 'fairs.name as title', 'fair_tickets.purchase_date', 'fair_tickets.ticket_price', 'fair_tickets.qr_code', DB::raw("'Fair Entry' as type"))
+            ->get();
+
+        $eventTickets = DB::table('event_tickets')
+            ->join('events', 'event_tickets.event_id', '=', 'events.event_id')
+            ->where('event_tickets.visitor_id', $userId)
+            ->select('event_tickets.event_ticket_id as id', 'events.name as title', 'event_tickets.purchase_date', 'event_tickets.ticket_price', 'event_tickets.qr_code', DB::raw("'Event Ticket' as type"))
+            ->get();
+
+        $allTickets = $fairTickets->concat($eventTickets)->sortByDesc('purchase_date');
+
+        return view('visitor.tickets', compact('allTickets'));
+    }
 }

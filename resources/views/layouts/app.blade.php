@@ -54,7 +54,10 @@
                                         Browse Fairs
                                     </a>
                                     <a href="{{ route('visitor.events') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('visitor.events') ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} text-sm font-medium leading-5 transition ml-8">
-                                        My Events
+                                        Browse Events
+                                    </a>
+                                    <a href="{{ route('visitor.tickets') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('visitor.tickets') ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} text-sm font-medium leading-5 transition ml-8">
+                                        My Tickets
                                     </a>
                                 @endif
 

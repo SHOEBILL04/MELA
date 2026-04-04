@@ -12,7 +12,30 @@ class FairController extends Controller
     public function index()
     {
         $fairs = DB::table('vw_FairSummary')->orderBy('fair_id', 'desc')->get();
-        return view('admin.fairs.index', compact('fairs'));
+        
+        $globalStats = [
+            'total_stalls_sold' => collect($fairs)->sum('stalls_sold'),
+            'total_stall_revenue' => collect($fairs)->sum('stall_revenue'),
+            'total_entry_revenue' => collect($fairs)->sum('entry_revenue'),
+            'total_event_revenue' => collect($fairs)->sum('event_revenue'),
+            'total_overall_revenue' => collect($fairs)->sum('total_fair_revenue'),
+        ];
+
+        $topEvents = DB::table('events')
+            ->leftJoin('event_tickets', 'events.event_id', '=', 'event_tickets.event_id')
+            ->select('events.name', DB::raw('COUNT(event_tickets.event_ticket_id) as tickets_sold'), DB::raw('COALESCE(SUM(event_tickets.ticket_price), 0) as revenue'))
+            ->groupBy('events.event_id', 'events.name')
+            ->orderByDesc('tickets_sold')
+            ->take(5)
+            ->get();
+
+        $dailyVisitors = DB::table('vw_DailyVisitorCount')
+            ->select('day_date', DB::raw('SUM(visitors_count) as total_visitors'))
+            ->groupBy('day_date')
+            ->orderBy('day_date')
+            ->get();
+
+        return view('admin.fairs.index', compact('fairs', 'globalStats', 'topEvents', 'dailyVisitors'));
     }
 
     public function show($id)
