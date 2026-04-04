@@ -71,6 +71,19 @@ class VendorController extends Controller
         return view('vendor.fairs', compact('fairs'));
     }
 
+    public function stalls($fair_id)
+    {
+        $fair = DB::table('fairs')->where('fair_id', $fair_id)->first();
+        if (!$fair) abort(404);
+
+        $stalls = DB::table('stalls')
+            ->where('fair_id', $fair_id)
+            ->orderBy('stall_number', 'asc')
+            ->get();
+
+        return view('vendor.stalls', compact('fair', 'stalls'));
+    }
+
     public function buyStall(Request $request)
     {
         try {
