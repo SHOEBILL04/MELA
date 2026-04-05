@@ -21,10 +21,14 @@ BEGIN
         END
 
         -- Approve the application
-        -- This will automatically trigger `trg_ApplicationStatusChange` which marks the position as `filled`
         UPDATE applications
         SET status = 'approved'
         WHERE application_id = @application_id;
+
+        -- Manually update position status to 'filled' (Safety for missing trigger)
+        UPDATE employee_positions
+        SET status = 'filled'
+        WHERE position_id = @position_id;
 
         -- Auto-reject all other pending applications for this position
         UPDATE applications

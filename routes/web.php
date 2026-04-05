@@ -40,6 +40,7 @@ Route::prefix('vendor')->middleware(['auth', 'role:vendor'])->name('vendor.')->g
     Route::get('/fairs', [VendorController::class, 'fairs'])->name('fairs');
     Route::get('/stalls/{fair_id}', [VendorController::class, 'stalls'])->name('stalls');
     Route::post('/buy-stall', [VendorController::class, 'buyStall'])->name('buy_stall');
+    Route::post('/positions/create', [VendorController::class, 'createPosition'])->name('positions.create');
     
     // Event Management Routes
     Route::get('/events', [VendorController::class, 'events'])->name('events');
@@ -58,6 +59,7 @@ Route::prefix('employee')->middleware(['auth', 'role:employee'])->name('employee
     Route::get('/dashboard', function() { return redirect()->route('employee.positions'); })->name('dashboard');
     Route::get('/positions', [EmployeeController::class, 'browsePositions'])->name('positions');
     Route::post('/position/apply/{id}', [EmployeeController::class, 'applyPosition'])->name('apply');
+    //post req asle applyposition method call hobe
     Route::get('/history', [EmployeeController::class, 'viewHistory'])->name('history');
 });
 

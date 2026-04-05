@@ -49,7 +49,7 @@
                     
                     <p class="text-sm font-medium text-slate-500 mt-1 mb-6 flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        Stall {{ $pos->stall_number }} ({{ $pos->category }})
+                        Stall {{ $pos->stall_number }} @if($pos->category) ({{ $pos->category }}) @endif
                     </p>
 
                     <div class="bg-slate-50 rounded-lg p-3 border border-slate-100 flex items-center gap-3">
@@ -62,7 +62,8 @@
                         </div>
                     </div>
                 </div>
-                
+
+                {{-- This part shows the apply button or a disabled button if already applied --}}
                 <div class="px-6 pb-6 mt-auto">
                     @if(in_array($pos->position_id, $appliedPositionsArray))
                         <button disabled class="w-full bg-slate-100 border border-slate-200 text-slate-400 font-bold py-2.5 px-4 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">

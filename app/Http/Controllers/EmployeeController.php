@@ -30,6 +30,7 @@ class EmployeeController extends Controller
     }
 
     // 2. Apply Logic
+    //post req asle applyposition method call hobe
     public function applyPosition(Request $request, $id)
     {
         $employeeId = auth()->id();
@@ -42,12 +43,12 @@ class EmployeeController extends Controller
         }
     }
 
-    // 3. Application History Logic (Tumar Notun Blade-er sathe match kora)
+    // 3. Application History Logic 
     public function viewHistory(Request $request)
     {
         $employeeId = auth()->id();
         
-        // Blade-er filter-er theke status anar beabostha
+        // Blade-er filter-er theke status anar beabos
         $statusFilter = $request->query('status', 'all');
 
         // Database theke employee-er applications data fetch kora
@@ -62,6 +63,7 @@ class EmployeeController extends Controller
                 'applications.applied_at',
                 'employee_positions.title as position_title',
                 'stalls.stall_number',
+                'stalls.category',
                 'fairs.name as fair_name'
             );
 

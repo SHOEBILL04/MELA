@@ -59,7 +59,7 @@
                                 </form>
                             @elseif($app->status == 'approved')
                                 <button disabled class="bg-green-100 text-green-700 border border-green-200 px-4 py-2 rounded-lg font-black text-xs cursor-not-allowed uppercase tracking-widest">
-                                    ✅ RECRUITED
+                                    ✅ HIRED
                                 </button>
                             @else
                                 <span class="text-slate-400 italic font-bold uppercase text-xs">{{ $app->status }}</span>
