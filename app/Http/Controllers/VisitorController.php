@@ -102,4 +102,15 @@ class VisitorController extends Controller
             return back()->with('error', 'Purchase failed: ' . $e->getMessage());
         }
     }
+
+    public function ticketHistory()
+    {
+        $userId = Auth::id();
+        $tickets = DB::table('vw_VisitorTickets')
+            ->where('visitor_id', $userId)
+            ->orderBy('purchase_date', 'desc')
+            ->get();
+            
+        return view('visitor.tickets', compact('tickets'));
+    }
 }

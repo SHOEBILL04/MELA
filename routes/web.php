@@ -30,6 +30,7 @@ Route::middleware(['auth', 'role:visitor'])->prefix('visitor')->name('visitor.')
     Route::post('/fair/buy/{fairId}/{dayId}', [VisitorController::class, 'buyFairTicket'])->name('buyFairTicket');
     Route::get('/events', [VisitorController::class, 'browseEvents'])->name('events');
     Route::post('/event/buy/{eventId}', [VisitorController::class, 'buyEventTicket'])->name('buyEventTicket');
+    Route::get('/tickets', [VisitorController::class, 'ticketHistory'])->name('tickets');
 });
 
 // Employee Routes
