@@ -47,7 +47,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex flex-col">
                                     <span class="text-sm font-bold text-slate-900">{{ $app->position_title }}</span>
-                                    <span class="text-xs font-medium text-slate-500">{{ $app->category ?? 'General Worker' }}</span>
+                                    <span class="text-xs font-medium text-slate-500">{{ $app->category }}</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4">

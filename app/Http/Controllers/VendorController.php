@@ -50,15 +50,14 @@ class VendorController extends Controller
     public function recruitEmployee($applicationId)
     {
         try {
-            // FIX: Positional parameter (?) use korlam jate SQL error na khay
             DB::statement("EXEC usp_RecruitEmployee ?", [$applicationId]);
             
-            // FIX: Jodi SP status update na kore, tobe Laravel theke Force Update kore dilam!
+            // Force status to approved in case SP logic is deferred
             DB::table('applications')
                 ->where('application_id', $applicationId)
                 ->update(['status' => 'approved']);
                 
-            return back()->with('success', 'Employee successfully recruited!');
+            return back()->with('success', 'Employee successfully hired!');
         } catch (\Exception $e) {
             // Error dhora porle jeno amra dekhte pari
             return back()->with('error', 'Database Error: ' . $e->getMessage());
@@ -173,5 +172,39 @@ class VendorController extends Controller
             ->get();
 
         return view('vendor.event_buyers', compact('event', 'buyers'));
+    }
+
+    public function createPosition(Request $request)
+    {
+        $request->validate([
+            'stall_id' => 'required|exists:stalls,stall_id',
+            'title' => 'required|string|max:100',
+            'salary' => 'nullable|numeric|min:0'
+        ]);
+
+        try {
+            // Verify if the stall belongs to the authenticated vendor
+            $stall = DB::table('stalls')
+                ->where('stall_id', $request->stall_id)
+                ->where('vendor_id', auth()->id())
+                ->first();
+
+            if (!$stall) {
+                return back()->with('error', 'Unauthorized or invalid stall.');
+            }
+
+            DB::table('employee_positions')->insert([
+                'stall_id' => $request->stall_id,
+                'title' => $request->title,
+                'salary' => $request->salary ?? 0.00,
+                'status' => 'open',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return back()->with('success', 'Job opening posted successfully for employees to apply!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error posting job: ' . $e->getMessage());
+        }
     }
 }
