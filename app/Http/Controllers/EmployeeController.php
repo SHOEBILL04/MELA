@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
+    // 1. Employee Dashboard / Browse Positions Logic
     public function browsePositions(Request $request)
     {
         $statusFilter = $request->query('fair_status', 'all');
@@ -20,59 +20,59 @@ class EmployeeController extends Controller
 
         $positions = $query->get();
 
-        return view('employee.positions', compact('positions', 'statusFilter'));
+        // Employee agey kon kon position-e apply korche shetar list ber kora holo
+        $appliedPositionsArray = DB::table('applications')
+            ->where('employee_id', auth()->id())
+            ->pluck('position_id')
+            ->toArray();
+
+        return view('employee.positions', compact('positions', 'statusFilter', 'appliedPositionsArray'));
     }
 
-    public function applyPosition(Request $request, $positionId)
+    // 2. Apply Logic
+    public function applyPosition(Request $request, $id)
     {
-        $user = Auth::user();
+        $employeeId = auth()->id();
 
-        // Perform raw insert so the MSSQL INSTEAD OF INSERT trigger can run
         try {
-            DB::table('applications')->insert([
-                'employee_id' => $user->user_id,
-                'position_id' => $positionId,
-                'status' => 'pending',
-                'applied_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-
-            return back()->with('success', 'Successfully applied to the position!');
+            DB::statement("EXEC usp_ApplyForPosition @position_id = ?, @employee_id = ?", [$id, $employeeId]);
+            return back()->with('success', 'Application submitted successfully!');
         } catch (\Exception $e) {
-            // Trigger will RAISERROR code, catch and show user
-            return back()->with('error', 'Error applying: ' . $e->getMessage());
+            return back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
+    // 3. Application History Logic (Tumar Notun Blade-er sathe match kora)
     public function viewHistory(Request $request)
     {
-        $user = Auth::user();
+        $employeeId = auth()->id();
+        
+        // Blade-er filter-er theke status anar beabostha
         $statusFilter = $request->query('status', 'all');
 
-        // Requirement: SELECT with ORDER BY, status filter, and correlated subquery
-        $sql = "
-            SELECT 
-                a.application_id, 
-                a.position_id, 
-                a.status, 
-                a.applied_at,
-                (SELECT ep.title FROM employee_positions ep WHERE ep.position_id = a.position_id) as position_title,
-                (SELECT s.category FROM stalls s WHERE s.stall_id = (SELECT ep.stall_id FROM employee_positions ep WHERE ep.position_id = a.position_id)) as category
-            FROM applications a
-            WHERE a.employee_id = ?
-        ";
-        $bindings = [$user->user_id];
+        // Database theke employee-er applications data fetch kora
+        $query = DB::table('applications')
+            ->join('employee_positions', 'applications.position_id', '=', 'employee_positions.position_id')
+            ->join('stalls', 'employee_positions.stall_id', '=', 'stalls.stall_id')
+            ->join('fairs', 'stalls.fair_id', '=', 'fairs.fair_id')
+            ->where('applications.employee_id', $employeeId)
+            ->select(
+                'applications.application_id',
+                'applications.status',
+                'applications.applied_at',
+                'employee_positions.title as position_title',
+                'stalls.stall_number',
+                'fairs.name as fair_name'
+            );
 
+        // Jodi user kono nirdishto status (pending/approved) filter kore
         if ($statusFilter !== 'all') {
-            $sql .= " AND a.status = ?";
-            $bindings[] = $statusFilter;
+            $query->where('applications.status', $statusFilter);
         }
 
-        $sql .= " ORDER BY a.applied_at DESC";
+        $applications = $query->orderBy('applications.applied_at', 'desc')->get();
 
-        $applications = DB::select($sql, $bindings);
-
+        // Tumar blade-er variabler nam-er sathe match kore pathalam
         return view('employee.history', compact('applications', 'statusFilter'));
     }
 }

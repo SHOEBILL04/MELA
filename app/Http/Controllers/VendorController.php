@@ -7,149 +7,151 @@ use Illuminate\Support\Facades\DB;
 
 class VendorController extends Controller
 {
+    // Dashboard: Only Welcome Summary & Pending Recruitment [cite: 23, 106]
+    public function dashboard()
+    {
+        $vendorId = auth()->id();
+        $stallCount = DB::table('stalls')->where('vendor_id', $vendorId)->count();
+
+        // FIX: ->where('applications.status', 'pending') kete diyechi, jate approved gulo o dekha jay
+        $applications = DB::table('applications')
+            ->join('users', 'applications.employee_id', '=', 'users.user_id')
+            ->join('employee_positions', 'applications.position_id', '=', 'employee_positions.position_id')
+            ->join('stalls', 'employee_positions.stall_id', '=', 'stalls.stall_id')
+            ->where('stalls.vendor_id', $vendorId)
+            ->select('applications.*', 'users.name as user_name', 'employee_positions.title')
+            ->orderBy('applications.applied_at', 'desc')
+            ->get();
+
+        return view('vendor.dashboard', compact('stallCount', 'applications'));
+    }
+
+    // My Stalls: Full Detailed Transaction Table [cite: 23, 106]
+    public function my_stalls()
+    {
+        $vendorId = auth()->id();
+        $myStalls = DB::table('stalls')
+            ->join('fairs', 'stalls.fair_id', '=', 'fairs.fair_id')
+            ->where('stalls.vendor_id', $vendorId)
+            ->select('stalls.*', 'fairs.name as fair_name')
+            ->orderBy('stalls.updated_at', 'desc')
+            ->get();
+
+        return view('vendor.my_stalls', compact('myStalls'));
+    }
+
+    public function recruitEmployee($applicationId)
+    {
+        try {
+            // FIX: Positional parameter (?) use korlam jate SQL error na khay
+            DB::statement("EXEC usp_RecruitEmployee ?", [$applicationId]);
+            
+            // FIX: Jodi SP status update na kore, tobe Laravel theke Force Update kore dilam!
+            DB::table('applications')
+                ->where('application_id', $applicationId)
+                ->update(['status' => 'approved']);
+                
+            return back()->with('success', 'Employee successfully recruited!');
+        } catch (\Exception $e) {
+            // Error dhora porle jeno amra dekhte pari
+            return back()->with('error', 'Database Error: ' . $e->getMessage());
+        }
+    }
+
     public function fairs()
     {
-        $fairs = DB::table('fairs')->whereIn('status', ['active', 'upcoming'])->orderBy('created_at', 'desc')->get();
+        $fairs = DB::table('fairs')->whereIn('status', ['active', 'upcoming'])->get();
         return view('vendor.fairs', compact('fairs'));
-    }
-
-    public function stalls($fair_id)
-    {
-        $fair = DB::table('fairs')->where('fair_id', $fair_id)->first();
-        if (!$fair) abort(404);
-        
-        $availableCount = DB::table('stalls')
-            ->where('fair_id', $fair_id)
-            ->where('status', 'available')
-            ->count();
-            
-        $stallPrice = DB::table('stalls')
-            ->where('fair_id', $fair_id)
-            ->value('price') ?? 0;
-
-        return view('stall_dashboard', compact('fair', 'availableCount', 'stallPrice'));
-    }
-
-    public function buyStallPage(Request $request)
-    {
-        $stall_id = $request->query('stall');
-        return view('buy_stall', compact('stall_id'));
     }
 
     public function buyStall(Request $request)
     {
+        try {
+            // Atomic transaction (Issue 12) [cite: 106, 136]
+            DB::statement("EXEC usp_BuyStall @vendor_id = ?, @stall_id = ?", [auth()->id(), $request->stall_id]);
+            return response()->json(['status' => 'success', 'message' => 'Stall secured!']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function events()
+    {
+        $vendorId = auth()->id();
+
+        // Get events created by this vendor
+        $events = DB::table('events')
+            ->join('fairs', 'events.fair_id', '=', 'fairs.fair_id')
+            ->where('events.vendor_id', $vendorId)
+            ->select('events.*', 'fairs.name as fair_name')
+            ->orderBy('events.event_date', 'asc')
+            ->get();
+
+        // Get fairs where vendor has a stall (to populate dropdown)
+        $stalledFairs = DB::table('fairs')
+            ->join('stalls', 'stalls.fair_id', '=', 'fairs.fair_id')
+            ->where('stalls.vendor_id', $vendorId)
+            ->select('fairs.fair_id', 'fairs.name')
+            ->distinct()
+            ->get();
+
+        return view('vendor.events', compact('events', 'stalledFairs'));
+    }
+
+    public function storeEvent(Request $request)
+    {
         $request->validate([
-            'vendor_id' => 'required|integer',
-            'stall_id' => 'required|integer',
+            'fair_id' => 'required|exists:fairs,fair_id',
+            'name' => 'required|string|max:150',
+            'event_date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'ticket_price' => 'required|numeric|min:0',
+            'max_capacity' => 'required|integer|min:1'
         ]);
 
         try {
-            DB::statement("SET NOCOUNT ON; EXEC usp_BuyStall @vendor_id = ?, @stall_id = ?", [
-                $request->vendor_id, 
-                $request->stall_id
+            DB::table('events')->insert([
+                'fair_id' => $request->fair_id,
+                'vendor_id' => auth()->id(),
+                'name' => $request->name,
+                'event_date' => $request->event_date,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'ticket_price' => $request->ticket_price,
+                'max_capacity' => $request->max_capacity,
+                'tickets_sold' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Stall purchased and locked successfully!'
-            ]);
-
+            return back()->with('success', 'Event successfully created!');
         } catch (\Exception $e) {
-            $errorMessage = $e->getMessage();
-
-            if (stripos($errorMessage, 'already sold') !== false || stripos($errorMessage, 'reserved') !== false) {
-                $userFriendlyMessage = "This stall is already sold or reserved by another vendor!";
-            } else {
-                $userFriendlyMessage = "Failed to buy stall: " . $e->getMessage();
-            }
-
-            return response()->json([
-                'status' => 'error',
-                'message' => $userFriendlyMessage
-            ], 400);
+            return back()->with('error', 'Error creating event: ' . $e->getMessage());
         }
     }
 
-    public function getAllStalls($fair_id)
+    public function eventBuyers($id)
     {
-        try {
-            $stalls = DB::select("SELECT stall_id, stall_number, status, price FROM stalls WHERE fair_id = ?", [$fair_id]);
-            return response()->json([
-                'status' => 'success',
-                'data' => $stalls
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ], 500);
+        $vendorId = auth()->id();
+
+        // Check if event belongs to this vendor
+        $event = DB::table('events')
+            ->where('event_id', $id)
+            ->where('vendor_id', $vendorId)
+            ->first();
+
+        if (!$event) {
+            abort(404);
         }
+
+        $buyers = DB::table('event_tickets')
+            ->join('users', 'event_tickets.visitor_id', '=', 'users.user_id')
+            ->where('event_tickets.event_id', $id)
+            ->select('users.name', 'users.email', 'event_tickets.purchase_date', 'event_tickets.ticket_price', 'event_tickets.qr_code')
+            ->orderBy('event_tickets.purchase_date', 'desc')
+            ->get();
+
+        return view('vendor.event_buyers', compact('event', 'buyers'));
     }
-
-    public function buyStallsBulk(Request $request)
-    {
-        $request->validate([
-            'vendor_id' => 'required|integer',
-            'fair_id' => 'required|integer',
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        $vendorId = $request->vendor_id;
-        $fairId = $request->fair_id;
-        $qty = $request->quantity;
-
-        try {
-            DB::beginTransaction();
-            
-            // Get available stalls for this fair with row lock
-            $stalls = DB::table('stalls')
-                ->where('fair_id', $fairId)
-                ->where('status', 'available')
-                ->lockForUpdate()
-                ->limit($qty)
-                ->get();
-
-            if ($stalls->count() < $qty) {
-                DB::rollBack();
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Not enough stalls available. Only ' . $stalls->count() . ' left.'
-                ], 400);
-            }
-
-            foreach ($stalls as $stall) {
-                DB::statement("SET NOCOUNT ON; EXEC usp_BuyStall @vendor_id = ?, @stall_id = ?", [
-                    $vendorId, 
-                    $stall->stall_id
-                ]);
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => "$qty Stalls secured successfully!"
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 'error',
-                'message' => "Failed to purchase stalls: " . $e->getMessage()
-            ], 400);
-        }
-    }
-    // VendorController.php er shesh function-ta
-public function my_stalls() 
-{
-    $vendorId = auth()->id();
-    $myStalls = DB::table('stalls')
-        ->join('fairs', 'stalls.fair_id', '=', 'fairs.fair_id')
-        ->where('stalls.vendor_id', $vendorId)
-        ->select('stalls.*', 'fairs.name as fair_name')
-        ->orderBy('stalls.updated_at', 'desc')
-        ->get();
-
-    return view('vendor.dashboard', compact('myStalls'));
-}
 }
