@@ -107,6 +107,7 @@ class EmployeeController extends Controller
                 'applications.application_id',
                 'applications.status',
                 'applications.applied_at',
+                'applications.position_id',
                 'employee_positions.title as position_title',
                 'stalls.stall_number',
                 'stalls.category',
@@ -119,8 +120,9 @@ class EmployeeController extends Controller
         }
 
         $applications = $query->orderBy('applications.applied_at', 'desc')->get();
+        $selectedApplications = $applications->where('status', 'approved')->values();
 
         // Tumar blade-er variabler nam-er sathe match kore pathalam
-        return view('employee.history', compact('applications', 'statusFilter'));
+        return view('employee.history', compact('applications', 'statusFilter', 'selectedApplications'));
     }
 }
