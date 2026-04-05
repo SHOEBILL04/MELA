@@ -21,40 +21,29 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Global Dashboard Route
+// Global Dashboard Redirect (Line 25-27 update)
+// 1. Global Redirect: Jei role-er user-i hok, /dashboard-e gele tar sothik jaygay niye jabe
 Route::middleware(['auth'])->get('/dashboard', function () {
-    return view('dashboard'); 
+    if (auth()->user()->role === 'vendor') {
+        return redirect()->route('vendor.dashboard');
+    }
+    // Visitor ba Employee hole tar route-e redirect hobe
+    return redirect()->route(auth()->user()->role . '.dashboard');
 })->name('dashboard');
 
-// Visitor Routes
-Route::middleware(['auth', 'role:visitor'])->prefix('visitor')->name('visitor.')->group(function () {
-    Route::get('/dashboard', function() { return redirect()->route('visitor.fairs'); })->name('dashboard');
-    Route::get('/fairs', [VisitorController::class, 'browseFairs'])->name('fairs');
-    Route::get('/fairs/{fair_id}/days', [VisitorController::class, 'fairDays'])->name('fair_days');
-    Route::post('/buy-fair-tickets-bulk', [VisitorController::class, 'buyFairTicketsBulk'])->name('buy_fair_tickets_bulk');
-    Route::post('/fair/buy/{fairId}/{dayId}', [VisitorController::class, 'buyFairTicket'])->name('buyFairTicket');
-    Route::get('/events', [VisitorController::class, 'browseEvents'])->name('events');
-    Route::post('/event/buy/{eventId}', [VisitorController::class, 'buyEventTicket'])->name('buyEventTicket');
-});
 
-// Employee Routes
-Route::middleware(['auth', 'role:employee'])->prefix('employee')->name('employee.')->group(function () {
-    Route::get('/dashboard', function() { return redirect()->route('employee.positions'); })->name('dashboard');
-    Route::get('/positions', [EmployeeController::class, 'browsePositions'])->name('positions');
-    Route::post('/position/apply/{id}', [EmployeeController::class, 'applyPosition'])->name('apply');
-    Route::get('/history', [EmployeeController::class, 'viewHistory'])->name('history');
-});
+// Vendor Routes Group
+Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->group(function () {
+    
+    // ১. DASHBOARD: Ekhane shudhu "Welcome" message dekhabe (No $myStalls data)
+    Route::get('/dashboard', function() { 
+        return view('dashboard'); // Eita main dashboard portal pathabe
+    })->name('dashboard');
 
-Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/fairs', [FairController::class, 'index'])->name('admin.fairs.index');
-    Route::get('/fairs/create', [FairController::class, 'create'])->name('admin.fairs.create');
-    Route::post('/fairs', [FairController::class, 'store'])->name('admin.fairs.store');
-    Route::get('/fairs/{id}', [FairController::class, 'show'])->name('admin.fairs.show');
-    Route::delete('/fairs/{id}', [FairController::class, 'destroy'])->name('admin.fairs.destroy');
-});
+    // ২. MY STALLS: Ekhane Transaction Table load hobe
+    Route::get('/my-stalls', [VendorController::class, 'my_stalls'])->name('my_stalls');
 
-// Vendor Routes
-Route::middleware(['auth'])->prefix('vendor')->name('vendor.')->group(function () {
+    // Baki Routes...
     Route::get('/fairs', [VendorController::class, 'fairs'])->name('fairs');
     Route::get('/stalls/{fair_id}', [VendorController::class, 'stalls'])->name('stalls');
     Route::get('/api/stalls/{fair_id}', [VendorController::class, 'getAllStalls']);

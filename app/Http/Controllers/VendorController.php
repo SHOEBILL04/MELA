@@ -139,4 +139,17 @@ class VendorController extends Controller
             ], 400);
         }
     }
+    // VendorController.php er shesh function-ta
+public function my_stalls() 
+{
+    $vendorId = auth()->id();
+    $myStalls = DB::table('stalls')
+        ->join('fairs', 'stalls.fair_id', '=', 'fairs.fair_id')
+        ->where('stalls.vendor_id', $vendorId)
+        ->select('stalls.*', 'fairs.name as fair_name')
+        ->orderBy('stalls.updated_at', 'desc')
+        ->get();
+
+    return view('vendor.dashboard', compact('myStalls'));
+}
 }
