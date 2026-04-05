@@ -69,4 +69,5 @@ Route::prefix('visitor')->middleware(['auth', 'role:visitor'])->name('visitor.')
     Route::post('/events/buy/{eventId}', [VisitorController::class, 'buyEventTicket'])->name('buyEventTicket');
     Route::get('/fairs/{fair_id}/days', [VisitorController::class, 'fairDays'])->name('fair_days');
     Route::post('/buy-fair-tickets-bulk', [VisitorController::class, 'buyFairTicketsBulk'])->name('buyFairTicketsBulk');
+    Route::get('/my-tickets', [VisitorController::class, 'myTickets'])->name('tickets');
 });

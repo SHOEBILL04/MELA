@@ -26,14 +26,21 @@ class VendorController extends Controller
         return view('vendor.dashboard', compact('stallCount', 'applications'));
     }
 
-    // My Stalls: Full Detailed Transaction Table [cite: 23, 106]
     public function my_stalls()
     {
         $vendorId = auth()->id();
+        
+        // Using vw_VendorStalls for employee count, but we need vendor_id which is in stalls table.
+        // Let's just do the DB query directly to include employee count if we don't want to rely on the View's vendor_name string match.
         $myStalls = DB::table('stalls')
             ->join('fairs', 'stalls.fair_id', '=', 'fairs.fair_id')
             ->where('stalls.vendor_id', $vendorId)
-            ->select('stalls.*', 'fairs.name as fair_name')
+            ->select(
+                'stalls.*', 
+                'fairs.name as fair_name',
+                DB::raw('(SELECT COUNT(*) FROM employee_positions WHERE employee_positions.stall_id = stalls.stall_id AND employee_positions.status = \'filled\') as employee_count'),
+                DB::raw('(SELECT COALESCE(SUM(et.ticket_price), 0) FROM events e JOIN event_tickets et ON e.event_id = et.event_id WHERE e.vendor_id = stalls.vendor_id AND e.fair_id = stalls.fair_id) as stall_revenue')
+            )
             ->orderBy('stalls.updated_at', 'desc')
             ->get();
 
@@ -62,6 +69,19 @@ class VendorController extends Controller
     {
         $fairs = DB::table('fairs')->whereIn('status', ['active', 'upcoming'])->get();
         return view('vendor.fairs', compact('fairs'));
+    }
+
+    public function stalls($fair_id)
+    {
+        $fair = DB::table('fairs')->where('fair_id', $fair_id)->first();
+        if (!$fair) abort(404);
+
+        $stalls = DB::table('stalls')
+            ->where('fair_id', $fair_id)
+            ->orderBy('stall_number', 'asc')
+            ->get();
+
+        return view('vendor.stalls', compact('fair', 'stalls'));
     }
 
     public function buyStall(Request $request)
