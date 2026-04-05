@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,6 +14,7 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'users';
     protected $primaryKey = 'user_id';
 
     /**
@@ -49,5 +51,40 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function administeredFairs(): HasMany
+    {
+        return $this->hasMany(Fair::class, 'admin_id', 'user_id');
+    }
+
+    public function ownedStalls(): HasMany
+    {
+        return $this->hasMany(Stall::class, 'vendor_id', 'user_id');
+    }
+
+    public function applications(): HasMany
+    {
+        return $this->hasMany(Application::class, 'employee_id', 'user_id');
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class, 'vendor_id', 'user_id');
+    }
+
+    public function fairTickets(): HasMany
+    {
+        return $this->hasMany(FairTicket::class, 'visitor_id', 'user_id');
+    }
+
+    public function eventTickets(): HasMany
+    {
+        return $this->hasMany(EventTicket::class, 'visitor_id', 'user_id');
+    }
+
+    public function stallBids(): HasMany
+    {
+        return $this->hasMany(StallBid::class, 'vendor_id', 'user_id');
     }
 }
