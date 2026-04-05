@@ -128,13 +128,6 @@
             </div>
         </main>
         
-        <footer class="bg-white border-t border-slate-200 py-8">
-            <div class="max-w-7xl mx-auto px-4 text-center">
-                <p class="text-sm text-slate-500">
-                    &copy; {{ date('Y') }} MELA Fair System by Member 1
-                </p>
-            </div>
-        </footer>
     </div>
 </body>
 </html>
