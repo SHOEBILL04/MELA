@@ -19,7 +19,7 @@ class VendorController extends Controller
             ->join('employee_positions', 'applications.position_id', '=', 'employee_positions.position_id')
             ->join('stalls', 'employee_positions.stall_id', '=', 'stalls.stall_id')
             ->where('stalls.vendor_id', $vendorId)
-            ->select('applications.*', 'users.name as user_name', 'employee_positions.title')
+            ->select('applications.*', 'users.name as user_name', 'users.email as user_email', 'employee_positions.title')
             ->orderBy('applications.applied_at', 'desc')
             ->get();
 

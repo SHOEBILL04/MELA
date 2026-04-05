@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mela_db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrongPassword123!"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      # This line ensures your database files are stored inside
+      # the Docker volume named 'mssql_data' and won't be lost
+      # when the container is stopped or removed.
+      - mssql_data:/var/opt/mssql
+
+volumes:
+  # Declaring the named volume so Docker creates it persistently.
+  mssql_data:

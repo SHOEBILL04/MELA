@@ -58,6 +58,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->grou
 Route::prefix('employee')->middleware(['auth', 'role:employee'])->name('employee.')->group(function () {
     Route::get('/dashboard', function() { return redirect()->route('employee.positions'); })->name('dashboard');
     Route::get('/positions', [EmployeeController::class, 'browsePositions'])->name('positions');
+    Route::get('/position/apply/{id}', [EmployeeController::class, 'showApplyForm'])->name('apply.form');
     Route::post('/position/apply/{id}', [EmployeeController::class, 'applyPosition'])->name('apply');
     //post req asle applyposition method call hobe
     Route::get('/history', [EmployeeController::class, 'viewHistory'])->name('history');
