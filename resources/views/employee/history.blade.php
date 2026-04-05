@@ -27,6 +27,48 @@
         </form>
     </div>
 
+    <div class="mb-8 bg-white shadow-sm border border-emerald-200 rounded-2xl overflow-hidden">
+        <div class="px-6 py-5 border-b border-emerald-100 bg-emerald-50/70 flex items-center justify-between gap-4">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">Selected Positions</h3>
+                <p class="text-sm text-slate-500 mt-1">These are the positions where you have been selected by a vendor.</p>
+            </div>
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-white border border-emerald-200 text-emerald-700 text-xs font-bold uppercase tracking-wider">
+                {{ $selectedApplications->count() }} Selected
+            </div>
+        </div>
+
+        @if($selectedApplications->isNotEmpty())
+            <div class="divide-y divide-emerald-50">
+                @foreach($selectedApplications as $selected)
+                    <div class="px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-base font-bold text-slate-900">{{ $selected->position_title }}</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                    Selected
+                                </span>
+                            </div>
+                            <p class="text-sm text-slate-600">
+                                {{ $selected->fair_name }} • Stall {{ $selected->stall_number }}
+                                @if($selected->category)
+                                    • {{ $selected->category }}
+                                @endif
+                            </p>
+                        </div>
+                        <div class="text-sm font-medium text-slate-500">
+                            Selected from application #{{ str_pad($selected->application_id, 4, '0', STR_PAD_LEFT) }}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="px-6 py-10 text-center">
+                <p class="text-sm font-medium text-slate-500">You have not been selected for any applied position yet.</p>
+            </div>
+        @endif
+    </div>
+
     <div class="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -65,7 +107,7 @@
                                 @elseif($app->status == 'approved')
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                        Hired
+                                        Selected
                                     </span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">
