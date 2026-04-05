@@ -112,7 +112,7 @@
                     </div>
 
                     <div>
-                        <label for="salary" class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Monthly Salary (Estimated)</label>
+                        <label for="salary" class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Daily Salary (Estimated)</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <span class="text-slate-400 font-bold">$</span>

@@ -18,7 +18,30 @@ BEGIN
     END
 
     -- If no duplicate, proceed with insertion
-    INSERT INTO applications (employee_id, position_id, status, applied_at, created_at, updated_at)
-    SELECT employee_id, position_id, ISNULL(status, 'pending'), ISNULL(applied_at, CURRENT_TIMESTAMP), created_at, updated_at 
+    INSERT INTO applications (
+        employee_id,
+        position_id,
+        applicant_name,
+        applicant_age,
+        applicant_gender,
+        home_location,
+        education_status,
+        status,
+        applied_at,
+        created_at,
+        updated_at
+    )
+    SELECT
+        employee_id,
+        position_id,
+        applicant_name,
+        applicant_age,
+        applicant_gender,
+        home_location,
+        education_status,
+        ISNULL(status, 'pending'),
+        ISNULL(applied_at, CURRENT_TIMESTAMP),
+        created_at,
+        updated_at
     FROM inserted;
 END;

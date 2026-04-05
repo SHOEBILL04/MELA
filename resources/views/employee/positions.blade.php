@@ -70,13 +70,10 @@
                             ✅ Already Applied
                         </button>
                     @else
-                        <form method="POST" action="{{ route('employee.apply', $pos->position_id) }}">
-                            @csrf
-                            <button type="submit" class="w-full bg-slate-900 hover:bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
-                                Quick Apply
-                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </button>
-                        </form>
+                        <a href="{{ route('employee.apply.form', $pos->position_id) }}" class="w-full bg-slate-900 hover:bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
+                            Quick Apply
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
                     @endif
                 </div>
             </div>

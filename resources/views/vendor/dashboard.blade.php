@@ -37,6 +37,7 @@
                     <tr>
                         <th class="p-4 text-xs font-bold uppercase text-slate-500">Applicant</th>
                         <th class="p-4 text-xs font-bold uppercase text-slate-500">Position</th>
+                        <th class="p-4 text-xs font-bold uppercase text-slate-500">Application Details</th>
                         <th class="p-4 text-xs font-bold uppercase text-slate-500">Applied Date</th>
                         <th class="p-4 text-xs font-bold uppercase text-slate-500 text-right">Action</th>
                     </tr>
@@ -44,8 +45,19 @@
                 <tbody class="divide-y divide-slate-50">
                     @forelse($applications as $app)
                     <tr class="hover:bg-slate-50/50 transition">
-                        <td class="p-4 font-bold text-slate-700">{{ $app->user_name }}</td>
+                        <td class="p-4">
+                            <div class="font-bold text-slate-700">{{ $app->applicant_name ?? $app->user_name }}</div>
+                            <div class="text-xs text-slate-400 mt-1">{{ $app->user_email }}</div>
+                        </td>
                         <td class="p-4 text-slate-600">{{ $app->title }}</td>
+                        <td class="p-4">
+                            <div class="grid gap-1 text-sm text-slate-600">
+                                <div><span class="font-semibold text-slate-800">Age:</span> {{ $app->applicant_age ?? 'N/A' }}</div>
+                                <div><span class="font-semibold text-slate-800">Gender:</span> {{ $app->applicant_gender ?? 'N/A' }}</div>
+                                <div><span class="font-semibold text-slate-800">Home:</span> {{ $app->home_location ?? 'N/A' }}</div>
+                                <div><span class="font-semibold text-slate-800">Education:</span> {{ $app->education_status ?? 'N/A' }}</div>
+                            </div>
+                        </td>
                         <td class="p-4 text-slate-400 text-sm">{{ $app->applied_at }}</td>
                         <td class="p-4 text-right">
                             
@@ -69,7 +81,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="p-12 text-center text-slate-400 italic font-medium">No applications found.</td>
+                        <td colspan="5" class="p-12 text-center text-slate-400 italic font-medium">No applications found.</td>
                     </tr>
                     @endforelse
                 </tbody>
