@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Stall;
+use App\Models\StallBid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -10,7 +12,7 @@ class BidController extends Controller
 {
     public function index()
     {
-        $bids = DB::table('stall_bids')
+        $bids = StallBid::query()
             ->join('users', 'stall_bids.vendor_id', '=', 'users.user_id')
             ->join('stalls', 'stall_bids.stall_id', '=', 'stalls.stall_id')
             ->join('fairs', 'stalls.fair_id', '=', 'fairs.fair_id')
@@ -30,17 +32,17 @@ class BidController extends Controller
 
     public function approve(Request $request, $bid_id)
     {
-        $bid = DB::table('stall_bids')->where('bid_id', $bid_id)->first();
+        $bid = StallBid::query()->where('bid_id', $bid_id)->first();
         if (!$bid || $bid->status !== 'pending') {
             return back()->with('error', 'Bid is invalid or already processed.');
         }
 
         try {
             // Check stall availability again
-            $stall = DB::table('stalls')->where('stall_id', $bid->stall_id)->first();
+            $stall = Stall::query()->where('stall_id', $bid->stall_id)->first();
             if (!$stall || $stall->status !== 'available') {
                 // Reject this bid if the stall was taken
-                DB::table('stall_bids')->where('bid_id', $bid_id)->update(['status' => 'rejected']);
+                StallBid::query()->where('bid_id', $bid_id)->update(['status' => 'rejected']);
                 return back()->with('error', 'This stall is already sold. Bid was automatically rejected.');
             }
 
@@ -51,10 +53,10 @@ class BidController extends Controller
             ]);
 
             // Update this bid as accepted
-            DB::table('stall_bids')->where('bid_id', $bid_id)->update(['status' => 'accepted']);
+            StallBid::query()->where('bid_id', $bid_id)->update(['status' => 'accepted']);
 
             // Reject all other pending bids for this stall
-            DB::table('stall_bids')
+            StallBid::query()
                 ->where('stall_id', $bid->stall_id)
                 ->where('bid_id', '!=', $bid_id)
                 ->update(['status' => 'rejected']);
@@ -68,12 +70,12 @@ class BidController extends Controller
 
     public function reject(Request $request, $bid_id)
     {
-        $bid = DB::table('stall_bids')->where('bid_id', $bid_id)->first();
+        $bid = StallBid::query()->where('bid_id', $bid_id)->first();
         if (!$bid || $bid->status !== 'pending') {
             return back()->with('error', 'Bid is invalid or already processed.');
         }
 
-        DB::table('stall_bids')->where('bid_id', $bid_id)->update(['status' => 'rejected']);
+        StallBid::query()->where('bid_id', $bid_id)->update(['status' => 'rejected']);
         return back()->with('success', 'Bid rejected successfully.');
     }
 }

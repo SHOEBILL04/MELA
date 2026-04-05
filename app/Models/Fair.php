@@ -22,11 +22,13 @@ class Fair extends Model
         'end_date',
         'total_stalls',
         'status',
+        'default_ticket_price',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'default_ticket_price' => 'decimal:2',
     ];
 
     public function admin(): BelongsTo

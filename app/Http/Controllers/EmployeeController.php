@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
+use App\Models\AvailablePosition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +14,7 @@ class EmployeeController extends Controller
     {
         $statusFilter = $request->query('fair_status', 'all');
 
-        $query = DB::table('vw_AvailablePositions');
+        $query = AvailablePosition::query();
         
         if ($statusFilter !== 'all') {
             $query->where('fair_status', $statusFilter);
@@ -21,7 +23,7 @@ class EmployeeController extends Controller
         $positions = $query->get();
 
         // Employee agey kon kon position-e apply korche shetar list ber kora holo
-        $appliedPositionsArray = DB::table('applications')
+        $appliedPositionsArray = Application::query()
             ->where('employee_id', auth()->id())
             ->pluck('position_id')
             ->toArray();
@@ -31,13 +33,13 @@ class EmployeeController extends Controller
 
     public function showApplyForm($id)
     {
-        $position = DB::table('vw_AvailablePositions')->where('position_id', $id)->first();
+        $position = AvailablePosition::query()->where('position_id', $id)->first();
 
         if (!$position) {
             abort(404);
         }
 
-        $alreadyApplied = DB::table('applications')
+        $alreadyApplied = Application::query()
             ->where('employee_id', auth()->id())
             ->where('position_id', $id)
             ->exists();
@@ -54,7 +56,7 @@ class EmployeeController extends Controller
     public function applyPosition(Request $request, $id)
     {
         $employeeId = auth()->id();
-        $position = DB::table('vw_AvailablePositions')->where('position_id', $id)->first();
+        $position = AvailablePosition::query()->where('position_id', $id)->first();
 
         if (!$position) {
             abort(404);
@@ -71,7 +73,7 @@ class EmployeeController extends Controller
         try {
             DB::statement("EXEC usp_ApplyForPosition @position_id = ?, @employee_id = ?", [$id, $employeeId]);
 
-            DB::table('applications')
+            Application::query()
                 ->where('employee_id', $employeeId)
                 ->where('position_id', $id)
                 ->update([
@@ -98,7 +100,7 @@ class EmployeeController extends Controller
         $statusFilter = $request->query('status', 'all');
 
         // Database theke employee-er applications data fetch kora
-        $query = DB::table('applications')
+        $query = Application::query()
             ->join('employee_positions', 'applications.position_id', '=', 'employee_positions.position_id')
             ->join('stalls', 'employee_positions.stall_id', '=', 'stalls.stall_id')
             ->join('fairs', 'stalls.fair_id', '=', 'fairs.fair_id')

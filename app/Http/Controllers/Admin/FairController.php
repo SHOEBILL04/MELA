@@ -3,6 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\DailyVisitorCount;
+use App\Models\Event;
+use App\Models\EventTicket;
+use App\Models\Fair;
+use App\Models\FairDay;
+use App\Models\FairSummary;
+use App\Models\FairTicket;
+use App\Models\Stall;
+use App\Models\StallBid;
+use App\Models\EmployeePosition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +21,7 @@ class FairController extends Controller
 {
     public function index()
     {
-        $fairs = DB::table('vw_FairSummary')->orderBy('fair_id', 'desc')->get();
+        $fairs = FairSummary::query()->orderBy('fair_id', 'desc')->get();
         
         $globalStats = [
             'total_stalls_sold' => collect($fairs)->sum('stalls_sold'),
@@ -21,7 +31,7 @@ class FairController extends Controller
             'total_overall_revenue' => collect($fairs)->sum('total_fair_revenue'),
         ];
 
-        $topEvents = DB::table('events')
+        $topEvents = Event::query()
             ->leftJoin('event_tickets', 'events.event_id', '=', 'event_tickets.event_id')
             ->select('events.name', DB::raw('COUNT(event_tickets.event_ticket_id) as tickets_sold'), DB::raw('COALESCE(SUM(event_tickets.ticket_price), 0) as revenue'))
             ->groupBy('events.event_id', 'events.name')
@@ -29,7 +39,7 @@ class FairController extends Controller
             ->take(5)
             ->get();
 
-        $dailyVisitors = DB::table('vw_DailyVisitorCount')
+        $dailyVisitors = DailyVisitorCount::query()
             ->select('day_date', DB::raw('SUM(visitors_count) as total_visitors'))
             ->groupBy('day_date')
             ->orderBy('day_date')
@@ -40,7 +50,7 @@ class FairController extends Controller
 
     public function show($id)
     {
-        $fair = DB::table('vw_FairSummary')->where('fair_id', $id)->first();
+        $fair = FairSummary::query()->where('fair_id', $id)->first();
         if (!$fair) {
             abort(404);
         }
@@ -100,21 +110,21 @@ class FairController extends Controller
     {
         try {
             // Delete child records first to handle missing ON DELETE CASCADE
-            DB::table('stall_bids')->whereIn('stall_id', function($q) use ($id) {
+            StallBid::query()->whereIn('stall_id', function($q) use ($id) {
                 $q->select('stall_id')->from('stalls')->where('fair_id', $id);
             })->delete();
-            DB::table('employee_positions')->whereIn('stall_id', function($q) use ($id) {
+            EmployeePosition::query()->whereIn('stall_id', function($q) use ($id) {
                 $q->select('stall_id')->from('stalls')->where('fair_id', $id);
             })->delete();
-            DB::table('stalls')->where('fair_id', $id)->delete();
-            DB::table('event_tickets')->whereIn('event_id', function($q) use ($id) {
+            Stall::query()->where('fair_id', $id)->delete();
+            EventTicket::query()->whereIn('event_id', function($q) use ($id) {
                 $q->select('event_id')->from('events')->where('fair_id', $id);
             })->delete();
-            DB::table('events')->where('fair_id', $id)->delete();
-            DB::table('fair_tickets')->where('fair_id', $id)->delete();
-            DB::table('fair_days')->where('fair_id', $id)->delete();
+            Event::query()->where('fair_id', $id)->delete();
+            FairTicket::query()->where('fair_id', $id)->delete();
+            FairDay::query()->where('fair_id', $id)->delete();
             
-            DB::table('fairs')->where('fair_id', $id)->delete();
+            Fair::query()->where('fair_id', $id)->delete();
             
             return redirect()->route('admin.fairs.index')->with('success', 'Fair deleted successfully!');
         } catch (\Exception $e) {

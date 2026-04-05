@@ -1,0 +1,31 @@
+[90m= [39m[34;4mApp\Models\Application[39;24m {#6553
+    [34mapplication_id[39m: "[32m1[39m",
+    [34memployee_id[39m: "[32m11[39m",
+    [34mposition_id[39m: "[32m1[39m",
+    [34mapplied_at[39m: "[32m2026-04-05 19:58:41.003[39m",
+    [34mstatus[39m: "[32mapproved[39m",
+    [34mcreated_at[39m: "[32m2026-04-05 19:58:41.003[39m",
+    [34mupdated_at[39m: "[32m2026-04-05 19:58:41.003[39m",
+    [34memployee[39m: [34;4mApp\Models\User[39;24m {#6599
+      [34muser_id[39m: "[32m11[39m",
+      [34mname[39m: "[32mEMOPLOYEE[39m",
+      [34memail[39m: "[32m_employee@gmail.com[39m",
+      [34memail_verified_at[39m: [36mnull[39m,
+      #[33mpassword[39m: "[32m$2y$12$BDf9iGBV4OT32pjSM4BS/ukdWR5qoIEJfNjvCYcXpB4hSPfdnJbS.[39m",
+      [34mrole[39m: "[32memployee[39m",
+      [34mphone[39m: [36mnull[39m,
+      #[33mremember_token[39m: [36mnull[39m,
+      [34mcreated_at[39m: "[32m2026-03-25 08:53:48.800[39m",
+      [34mupdated_at[39m: "[32m2026-03-25 08:53:48.800[39m",
+    },
+    [34mposition[39m: [34;4mApp\Models\EmployeePosition[39;24m {#6515
+      [34mposition_id[39m: "[32m1[39m",
+      [34mstall_id[39m: "[32m47[39m",
+      [34mtitle[39m: "[32mSales Person[39m",
+      [34mstatus[39m: "[32mopen[39m",
+      [34msalary[39m: "[32m10000.00[39m",
+      [34mcreated_at[39m: "[32m2026-04-05 13:54:35.427[39m",
+      [34mupdated_at[39m: "[32m2026-04-05 13:54:35.427[39m",
+    },
+  }
+
