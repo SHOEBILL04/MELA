@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
+use App\Models\EmployeePosition;
+use App\Models\Event;
+use App\Models\EventTicket;
+use App\Models\Fair;
+use App\Models\Stall;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -11,10 +17,10 @@ class VendorController extends Controller
     public function dashboard()
     {
         $vendorId = auth()->id();
-        $stallCount = DB::table('stalls')->where('vendor_id', $vendorId)->count();
+        $stallCount = Stall::query()->where('vendor_id', $vendorId)->count();
 
         // FIX: ->where('applications.status', 'pending') kete diyechi, jate approved gulo o dekha jay
-        $applications = DB::table('applications')
+        $applications = Application::query()
             ->join('users', 'applications.employee_id', '=', 'users.user_id')
             ->join('employee_positions', 'applications.position_id', '=', 'employee_positions.position_id')
             ->join('stalls', 'employee_positions.stall_id', '=', 'stalls.stall_id')
@@ -32,7 +38,7 @@ class VendorController extends Controller
         
         // Using vw_VendorStalls for employee count, but we need vendor_id which is in stalls table.
         // Let's just do the DB query directly to include employee count if we don't want to rely on the View's vendor_name string match.
-        $myStalls = DB::table('stalls')
+        $myStalls = Stall::query()
             ->join('fairs', 'stalls.fair_id', '=', 'fairs.fair_id')
             ->where('stalls.vendor_id', $vendorId)
             ->select(
@@ -53,7 +59,7 @@ class VendorController extends Controller
             DB::statement("EXEC usp_RecruitEmployee ?", [$applicationId]);
             
             // Force status to approved in case SP logic is deferred
-            DB::table('applications')
+            Application::query()
                 ->where('application_id', $applicationId)
                 ->update(['status' => 'approved']);
                 
@@ -66,16 +72,16 @@ class VendorController extends Controller
 
     public function fairs()
     {
-        $fairs = DB::table('fairs')->whereIn('status', ['active', 'upcoming'])->get();
+        $fairs = Fair::query()->whereIn('status', ['active', 'upcoming'])->get();
         return view('vendor.fairs', compact('fairs'));
     }
 
     public function stalls($fair_id)
     {
-        $fair = DB::table('fairs')->where('fair_id', $fair_id)->first();
+        $fair = Fair::query()->where('fair_id', $fair_id)->first();
         if (!$fair) abort(404);
 
-        $stalls = DB::table('stalls')
+        $stalls = Stall::query()
             ->where('fair_id', $fair_id)
             ->orderBy('stall_number', 'asc')
             ->get();
@@ -99,7 +105,7 @@ class VendorController extends Controller
         $vendorId = auth()->id();
 
         // Get events created by this vendor
-        $events = DB::table('events')
+        $events = Event::query()
             ->join('fairs', 'events.fair_id', '=', 'fairs.fair_id')
             ->where('events.vendor_id', $vendorId)
             ->select('events.*', 'fairs.name as fair_name')
@@ -107,7 +113,7 @@ class VendorController extends Controller
             ->get();
 
         // Get fairs where vendor has a stall (to populate dropdown)
-        $stalledFairs = DB::table('fairs')
+        $stalledFairs = Fair::query()
             ->join('stalls', 'stalls.fair_id', '=', 'fairs.fair_id')
             ->where('stalls.vendor_id', $vendorId)
             ->select('fairs.fair_id', 'fairs.name')
@@ -130,7 +136,7 @@ class VendorController extends Controller
         ]);
 
         try {
-            DB::table('events')->insert([
+            Event::query()->create([
                 'fair_id' => $request->fair_id,
                 'vendor_id' => auth()->id(),
                 'name' => $request->name,
@@ -140,8 +146,6 @@ class VendorController extends Controller
                 'ticket_price' => $request->ticket_price,
                 'max_capacity' => $request->max_capacity,
                 'tickets_sold' => 0,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
 
             return back()->with('success', 'Event successfully created!');
@@ -155,7 +159,7 @@ class VendorController extends Controller
         $vendorId = auth()->id();
 
         // Check if event belongs to this vendor
-        $event = DB::table('events')
+        $event = Event::query()
             ->where('event_id', $id)
             ->where('vendor_id', $vendorId)
             ->first();
@@ -164,7 +168,7 @@ class VendorController extends Controller
             abort(404);
         }
 
-        $buyers = DB::table('event_tickets')
+        $buyers = EventTicket::query()
             ->join('users', 'event_tickets.visitor_id', '=', 'users.user_id')
             ->where('event_tickets.event_id', $id)
             ->select('users.name', 'users.email', 'event_tickets.purchase_date', 'event_tickets.ticket_price', 'event_tickets.qr_code')
@@ -184,7 +188,7 @@ class VendorController extends Controller
 
         try {
             // Verify if the stall belongs to the authenticated vendor
-            $stall = DB::table('stalls')
+            $stall = Stall::query()
                 ->where('stall_id', $request->stall_id)
                 ->where('vendor_id', auth()->id())
                 ->first();
@@ -193,13 +197,11 @@ class VendorController extends Controller
                 return back()->with('error', 'Unauthorized or invalid stall.');
             }
 
-            DB::table('employee_positions')->insert([
+            EmployeePosition::query()->create([
                 'stall_id' => $request->stall_id,
                 'title' => $request->title,
                 'salary' => $request->salary ?? 0.00,
                 'status' => 'open',
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
 
             return back()->with('success', 'Job opening posted successfully for employees to apply!');

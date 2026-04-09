@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
+use App\Models\EventTicket;
+use App\Models\Fair;
+use App\Models\FairDay;
+use App\Models\FairTicket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +15,7 @@ class VisitorController extends Controller
 {
     public function browseFairs()
     {
-        $fairs = DB::table('fairs')
+        $fairs = Fair::query()
             ->whereIn('status', ['active', 'upcoming'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -20,10 +25,10 @@ class VisitorController extends Controller
 
     public function fairDays($fair_id)
     {
-        $fair = DB::table('fairs')->where('fair_id', $fair_id)->first();
+        $fair = Fair::query()->where('fair_id', $fair_id)->first();
         if (!$fair) abort(404);
 
-        $fairDays = DB::table('fair_days')
+        $fairDays = FairDay::query()
             ->where('fair_id', $fair_id)
             ->selectRaw('
                 day_id, 
@@ -52,13 +57,13 @@ class VisitorController extends Controller
         $qty = $request->quantity;
 
         // Fetch ticket price from fair
-        $ticketPrice = DB::table('fairs')->where('fair_id', $fairId)->value('default_ticket_price') ?? 50.00;
+        $ticketPrice = Fair::query()->where('fair_id', $fairId)->value('default_ticket_price') ?? 50.00;
 
         try {
             DB::beginTransaction();
 
             // Lock the fair_day for update to prevent overselling race conditions
-            $day = DB::table('fair_days')
+            $day = FairDay::query()
                 ->where('day_id', $dayId)
                 ->where('fair_id', $fairId)
                 ->lockForUpdate()
@@ -108,29 +113,28 @@ class VisitorController extends Controller
 
         // 2. SELECT with EXISTS subquery for FK check
         // Only show events if the user already possesses a fair_ticket for that fair
-        $sql = "
-            SELECT 
-                e.event_id,
-                e.fair_id,
-                e.name as event_name,
-                e.event_date,
-                e.start_time,
-                e.end_time,
-                e.ticket_price,
-                e.max_capacity,
-                e.tickets_sold,
-                f.name as fair_name
-            FROM events e
-            INNER JOIN fairs f ON e.fair_id = f.fair_id
-            WHERE EXISTS (
-                SELECT 1 
-                FROM fair_tickets ft 
-                WHERE ft.fair_id = e.fair_id AND ft.visitor_id = ?
+        $events = Event::query()
+            ->join('fairs', 'events.fair_id', '=', 'fairs.fair_id')
+            ->whereExists(function ($query) use ($userId) {
+                $query->selectRaw('1')
+                    ->from('fair_tickets')
+                    ->whereColumn('fair_tickets.fair_id', 'events.fair_id')
+                    ->where('fair_tickets.visitor_id', $userId);
+            })
+            ->select(
+                'events.event_id',
+                'events.fair_id',
+                'events.name as event_name',
+                'events.event_date',
+                'events.start_time',
+                'events.end_time',
+                'events.ticket_price',
+                'events.max_capacity',
+                'events.tickets_sold',
+                'fairs.name as fair_name'
             )
-            ORDER BY e.event_date ASC
-        ";
-
-        $events = DB::select($sql, [$userId]);
+            ->orderBy('events.event_date', 'asc')
+            ->get();
 
         return view('visitor.events', compact('events'));
     }
@@ -140,7 +144,7 @@ class VisitorController extends Controller
         $user = Auth::user();
         
         // Find ticket price for the event
-        $event = DB::table('events')->where('event_id', $eventId)->first();
+        $event = Event::query()->where('event_id', $eventId)->first();
         if (!$event) {
             return back()->with('error', 'Event not found.');
         }
@@ -161,13 +165,13 @@ class VisitorController extends Controller
     {
         $userId = Auth::user()->user_id;
 
-        $fairTickets = DB::table('fair_tickets')
+        $fairTickets = FairTicket::query()
             ->join('fairs', 'fair_tickets.fair_id', '=', 'fairs.fair_id')
             ->where('fair_tickets.visitor_id', $userId)
             ->select('fair_tickets.ticket_id as id', 'fairs.name as title', 'fair_tickets.purchase_date', 'fair_tickets.ticket_price', 'fair_tickets.qr_code', DB::raw("'Fair Entry' as type"))
             ->get();
 
-        $eventTickets = DB::table('event_tickets')
+        $eventTickets = EventTicket::query()
             ->join('events', 'event_tickets.event_id', '=', 'events.event_id')
             ->where('event_tickets.visitor_id', $userId)
             ->select('event_tickets.event_ticket_id as id', 'events.name as title', 'event_tickets.purchase_date', 'event_tickets.ticket_price', 'event_tickets.qr_code', DB::raw("'Event Ticket' as type"))
